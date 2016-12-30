@@ -23,16 +23,20 @@ public class ApplicationWindow {
 	private JFrame _frame;
 	private List _list;
 	private JMenuBar _menuBar;
-
+	private static rssParser _parser;
 	/**
 	 * Launch the application.
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					ApplicationWindow window = new ApplicationWindow();
 					window._frame.setVisible(true);
+
+//					_parser = new rssParser();
+					rssParser.getContent();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
