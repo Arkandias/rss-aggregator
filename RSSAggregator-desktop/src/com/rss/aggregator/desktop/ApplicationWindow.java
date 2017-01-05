@@ -1,29 +1,30 @@
 package com.rss.aggregator.desktop;
 
-import java.awt.EventQueue;
-
-import javax.lang.model.element.QualifiedNameable;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JMenu;
-
 import java.awt.BorderLayout;
-import javax.swing.JTextField;
+import java.awt.EventQueue;
 import java.awt.List;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import com.sun.org.apache.commons.digester.rss.Item;
 
 public class ApplicationWindow {
 
 	private JFrame _frame;
 	private List _list;
 	private JMenuBar _menuBar;
-	private static rssParser _parser;
+	private static Item[] _rssItems;
+	private JTextArea rssTextArea;
+	private JScrollPane scrollPane;
 	/**
 	 * Launch the application.
 	 * @throws Exception 
@@ -34,9 +35,6 @@ public class ApplicationWindow {
 				try {
 					ApplicationWindow window = new ApplicationWindow();
 					window._frame.setVisible(true);
-
-//					_parser = new rssParser();
-					rssParser.getContent();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -56,19 +54,40 @@ public class ApplicationWindow {
 	 */
 	private void initialize() {
 		_frame = new JFrame();
-		_frame.setBounds(100, 100, 557, 386);
+		_frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+		_frame.setUndecorated(false);
+		_frame.setVisible(true);
+
 		_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		_list = new List();
 		_list.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				// selection item changed
+				try {
+					_rssItems = rssParser.getContent();
+					rssTextArea.setText(null);
+				    for (int i = 0; i < _rssItems.length; i++) {
+				    	String text = rssTextArea.getText();
+				    	rssTextArea.setText(text + _rssItems[i].getTitle() + "\n");
+				    	text = rssTextArea.getText();
+				    	rssTextArea.setText(text + _rssItems[i].getLink() + "\n");
+				    	text = rssTextArea.getText();
+				    	rssTextArea.setText(text + _rssItems[i].getDescription() + "\n" + "\n");
+				     }
+				    rssTextArea.setCaretPosition(0);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		_list.add("test1");
 		_list.add("test2");
 		_list.add("test3");
 		_frame.getContentPane().add(_list, BorderLayout.WEST);
+		
+		rssTextArea = new JTextArea();
+		scrollPane = new JScrollPane(rssTextArea);
+		_frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
 		_menuBar = new JMenuBar();
 		JMenu menu1 = new JMenu();
@@ -99,5 +118,4 @@ public class ApplicationWindow {
 		_menuBar.add(menu2);
 		_frame.setJMenuBar(_menuBar);
 	}
-
 }
