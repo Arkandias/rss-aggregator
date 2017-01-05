@@ -162,7 +162,26 @@ public class ApplicationWindow {
 	                        }
 	                    }
 	                });
+					JMenuItem delSub = new JMenuItem("Supprimer");
+					addSub.addActionListener(new ActionListener() {
+	                    public void actionPerformed(ActionEvent e) {
+	                        JPanel panel = new JPanel(new GridLayout(0, 1));
+	                    	panel.add(new JLabel("Voulez-vous supprimer" + _list.getSelectedItem() + " ?"));
+	                    	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Ajouter un flux RSS",
+	                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	                    	if (result == JOptionPane.OK_OPTION) {
+	                    		_feedMap.remove(_list.getSelectedItem());
+	                    		// send to DB
+	                    		_list.remove(_list.getSelectedItem());
+	                    		_list.select(0);
+	                        } else {
+	                            System.out.println("Cancelled");
+	                        }
+	                    }
+	                   });
+					
 					popMenu.add(addSub);
+					popMenu.add(delSub);
 					popMenu.show(arg0.getComponent(), arg0.getX(), arg0.getY());
 					_frame.revalidate();
 				}
