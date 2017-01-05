@@ -3,7 +3,10 @@ package com.rss.aggregator.desktop;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -12,13 +15,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.Popup;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -123,8 +132,36 @@ public class ApplicationWindow {
 			public void mouseClicked(MouseEvent arg0) {
 				if (SwingUtilities.isRightMouseButton(arg0))
 				{
-					JPopupMenu popMenu = new JPopupMenu();
+					JPopupMenu popMenu;
+				    popMenu = new JPopupMenu();
+				    ActionListener menuListener = new ActionListener() {
+				      public void actionPerformed(ActionEvent event) {
+				        System.out.println("Popup menu item ["
+				            + event.getActionCommand() + "] was pressed.");
+				      }
+				    };
+//					JPopupMenu popMenu = new JPopupMenu();
 					JMenuItem addSub = new JMenuItem("Add a subscription");
+					addSub.addActionListener(new ActionListener() {
+	                    public void actionPerformed(ActionEvent e) {
+	                    	JTextField name = new JTextField();
+	                    	JTextField url = new JTextField();
+	                        JPanel panel = new JPanel(new GridLayout(0, 1));
+	                    	panel.add(new JLabel("Name :"));
+	                        panel.add(name);
+	                        panel.add(new JLabel("URL :"));
+	                        panel.add(url);
+	                    	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Ajouter un flux RSS",
+	                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+	                    	if (result == JOptionPane.OK_OPTION) {
+	                    		_feedMap.put(name.getText(), url.getText());
+	                    		_list.add(name.getText());
+	                    		// send to DB
+	                        } else {
+	                            System.out.println("Cancelled");
+	                        }
+	                    }
+	                });
 					popMenu.add(addSub);
 					popMenu.show(arg0.getComponent(), arg0.getX(), arg0.getY());
 					_frame.revalidate();
