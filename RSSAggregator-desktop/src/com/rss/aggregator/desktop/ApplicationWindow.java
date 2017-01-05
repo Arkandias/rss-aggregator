@@ -9,6 +9,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JEditorPane;
@@ -25,14 +26,14 @@ import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import com.sun.org.apache.commons.digester.rss.Item;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
 
 public class ApplicationWindow {
 
 	private JFrame _frame;
 	private List _list;
 	private JMenuBar _menuBar;
-	private static Item[] _rssItems;
 	private JScrollPane _scrollPane;
 	private JEditorPane _pane;
 	private Map<String, String> _feedMap;
@@ -79,13 +80,16 @@ public class ApplicationWindow {
         HTMLEditorKit editorKit = (HTMLEditorKit) _pane.getEditorKit();
 
         try {
-			_rssItems = rssParser.getContent(_feedMap.get(_list.getSelectedItem()));
+        	SyndFeed feeds = rssParser.getRSSContent(_feedMap.get(_list.getSelectedItem()));
 			_pane.setText("");
-		    for (int i = 0; i < _rssItems.length; i++) {
-	            editorKit.insertHTML(doc, doc.getLength(), "<h2><a href=\"" + _rssItems[i].getLink() + "\">" +
-	            											_rssItems[i].getTitle() + "</a></h2>", 0, 0, null);
-	            editorKit.insertHTML(doc, doc.getLength(), "<p>" + _rssItems[i].getDescription() + "</p></div>", 0, 0, null);
-            }
+
+			for (Iterator i = feeds.getEntries().iterator(); i.hasNext();) {
+				SyndEntry entry = (SyndEntry) i.next();
+	            editorKit.insertHTML(doc, doc.getLength(), "<h2><a href=\"" + entry.getLink() + "\">" +
+	            		entry.getTitle() + "</a></h2>", 0, 0, null);
+	            editorKit.insertHTML(doc, doc.getLength(), "<p>" + entry.getPublishedDate() + "</p></div>", 0, 0, null);
+	            editorKit.insertHTML(doc, doc.getLength(), "<p>" + entry.getDescription().getValue() + "</p></div>", 0, 0, null);
+			}
         } catch (Exception e) {
             ((Throwable) e).printStackTrace();
         }
@@ -106,6 +110,8 @@ public class ApplicationWindow {
 		/* request server to get rss and push to map*/
 		_feedMap.put("rgagnon", "http://www.rgagnon.com/feed.xml");
 		_feedMap.put("xkcd.com", "http://xkcd.com/rss.xml");
+		_feedMap.put("inessential", "http://inessential.com/xml/rss.xml");
+		
 		
 		for (String key : _feedMap.keySet())
 		{
