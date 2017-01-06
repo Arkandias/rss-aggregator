@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,8 +45,13 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
+
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.JButton;
+import java.awt.Font;
+import java.awt.Toolkit;
+import javax.swing.ImageIcon;
 
 public class ApplicationWindow {
 
@@ -53,11 +60,11 @@ public class ApplicationWindow {
 	private JMenuBar _menuBar;
 	private JScrollPane _scrollPane;
 	private JEditorPane _pane;
-	private User _user;
 	private Component horizontalGlue;
 	private JButton _connectionBtn;
 	private JButton _registerBtn;
-//	private Map<String, String> _feedMap;
+
+	private User _user;
 	
 	public class User
 	{
@@ -103,6 +110,7 @@ public class ApplicationWindow {
 			public void run() {
 				try {
 					ApplicationWindow window = new ApplicationWindow();
+				 	window._frame.setIconImage(ImageIO.read(getClass().getResource("/resources/rss.png")).getScaledInstance(25, 25, 3));
 					window._frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -117,7 +125,11 @@ public class ApplicationWindow {
 	public ApplicationWindow() {
 		_user = new User();
 		_frame = new JFrame();
+		_frame.setIconImage(Toolkit.getDefaultToolkit().getImage(ApplicationWindow.class.getResource("/resources/rss.ico")));
 		_list = new List();
+		_list.setFont(new Font("Dialog", Font.BOLD, 12));
+		_list.setForeground(Color.LIGHT_GRAY);
+		_list.setBackground(Color.DARK_GRAY);
 
 		initialize();
 		setMenu();
@@ -151,12 +163,10 @@ public class ApplicationWindow {
         } catch (Exception e) {
             ((Throwable) e).printStackTrace();
         }
-		
 	}
 
 
 	private void setList() {
-//		_user.setSubFeed(new HashMap<String, String>());
 		/* request server to get rss and push to map*/
 		_user.addFeed("rgagnon", "http://www.rgagnon.com/feed.xml");
 		_user.addFeed("xkcd.com", "http://xkcd.com/rss.xml");
@@ -165,8 +175,6 @@ public class ApplicationWindow {
 		_list.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				String feedUrl = _user.getSubFeed().get(_list.getSelectedItem());
-				System.out.println("url : " + feedUrl);
-				System.out.println("item : " + _list.getSelectedItem());
 				populatePane(feedUrl);
 			}
 		});
@@ -193,6 +201,7 @@ public class ApplicationWindow {
 
 	private void setFeedZone() {
 		_pane = new JEditorPane();
+		_pane.setBackground(Color.GRAY);
         _pane.setEditable(false);
         _pane.setContentType("text/html");
 
@@ -250,14 +259,26 @@ public class ApplicationWindow {
 		menu2.setText("Other");
 	
 		horizontalGlue = Box.createHorizontalGlue();
-		_connectionBtn = new JButton("Connetion");
+		_connectionBtn = new JButton("Connection");
+		 try {
+			 	Image img = ImageIO.read(getClass().getResource("/resources/user-login.png"));
+			    _connectionBtn.setIcon(new ImageIcon(img.getScaledInstance(25, 25, 3)));
+		  } catch (Exception ex) {
+			    System.out.println(ex);
+		  }
 		_connectionBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				_connectUser();
+				_connectModal();
 			}
 		});
 		_registerBtn = new JButton("Cr\u00E9er un compte");
+		 try {
+			 	Image img = ImageIO.read(getClass().getResource("/resources/users-add-user-icon.png"));
+			 	_registerBtn.setIcon(new ImageIcon(img.getScaledInstance(25, 25, 3)));
+		  } catch (Exception ex) {
+			    System.out.println(ex);
+		  }
 		_registerBtn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -272,7 +293,7 @@ public class ApplicationWindow {
 		_menuBar.add(_registerBtn);
 	}
 
-	private void _connectUser() {
+	private void _connectModal() {
 		if (_user.getAccount().equals(""))
 		{
            	JTextField name = new JTextField();
@@ -349,6 +370,7 @@ public class ApplicationWindow {
             System.out.println("register Cancelled");
         }
 	}
+	
 	private void drawSubMenu(JPopupMenu popMenu) {
 		JMenuItem addSub = new JMenuItem("Add a subscription");
 		addSub.addActionListener(new ActionListener() {
@@ -391,7 +413,6 @@ public class ApplicationWindow {
                 }
             }
            });
-		
 		popMenu.add(addSub);
 		popMenu.add(delSub);
 	}
