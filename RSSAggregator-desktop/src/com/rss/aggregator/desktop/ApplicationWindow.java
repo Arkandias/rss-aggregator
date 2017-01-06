@@ -31,12 +31,17 @@ import javax.swing.Popup;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
+import java.awt.Button;
+import java.awt.Component;
+import javax.swing.Box;
+import javax.swing.JButton;
 
 public class ApplicationWindow {
 
@@ -46,6 +51,9 @@ public class ApplicationWindow {
 	private JScrollPane _scrollPane;
 	private JEditorPane _pane;
 	private User _user;
+	private Component horizontalGlue;
+	private JButton _connectionBtn;
+	private JButton _registerBtn;
 //	private Map<String, String> _feedMap;
 	
 	public class User
@@ -55,6 +63,7 @@ public class ApplicationWindow {
 		
 		public User() {
 			this._feedMap = new HashMap<String, String>();
+			this.account = new String ("");
 		}
 		public Map<String, String> getSubFeed() {
 			return this._feedMap;
@@ -103,21 +112,22 @@ public class ApplicationWindow {
 	 * Create the application.
 	 */
 	public ApplicationWindow() {
+		_user = new User();
+		_frame = new JFrame();
+		_list = new List();
+
 		initialize();
-		_list.select(0);
-		populatePane(_list.getSelectedItem());
+		setMenu();
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		_frame = new JFrame();
-		_user = new User();
-
 		setList();
+		_list.select(0);
 		setFeedZone();
-		setMenu();
+		populatePane(_list.getSelectedItem());
 	}
 	
 	private void populatePane(String feedUrl) {
@@ -143,23 +153,22 @@ public class ApplicationWindow {
 
 
 	private void setList() {
-		_list = new List();
-		_list.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				String feedUrl = _user.getSubFeed().get(_list.getSelectedItem());
-				populatePane(feedUrl);
-			}
-		});
-		
 //		_user.setSubFeed(new HashMap<String, String>());
 		/* request server to get rss and push to map*/
 		_user.addFeed("rgagnon", "http://www.rgagnon.com/feed.xml");
 		_user.addFeed("xkcd.com", "http://xkcd.com/rss.xml");
 		_user.addFeed("inessential", "http://inessential.com/xml/rss.xml");
 		
-		
-		for (String key : _user.getSubFeed().keySet())
-		{
+		_list.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				String feedUrl = _user.getSubFeed().get(_list.getSelectedItem());
+				System.out.println("url : " + feedUrl);
+				System.out.println("item : " + _list.getSelectedItem());
+				populatePane(feedUrl);
+			}
+		});
+
+		for (String key : _user.getSubFeed().keySet()) {
 			_list.add(key);
 		}
 
@@ -194,7 +203,7 @@ public class ApplicationWindow {
 	                    		_list.add(name.getText());
 	                    		// send to DB
 	                        } else {
-	                            System.out.println("Cancelled");
+	                            System.out.println("add sub Cancelled");
 	                        }
 	                    }
 	                });
@@ -212,7 +221,7 @@ public class ApplicationWindow {
 	                    		_list.select(0);
 	                    		populatePane(_list.getSelectedItem());
 	                        } else {
-	                            System.out.println("Cancelled");
+	                            System.out.println("delete sub Cancelled");
 	                        }
 	                    }
 	                   });
@@ -233,7 +242,6 @@ public class ApplicationWindow {
         _pane.setContentType("text/html");
 
         _pane.addHyperlinkListener(new HyperlinkListener() {
-
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
 
@@ -286,8 +294,81 @@ public class ApplicationWindow {
 		menu1.add(menuItem);
 		menu2.setText("Other");
 	
+		horizontalGlue = Box.createHorizontalGlue();
+		_connectionBtn = new JButton("Connetion");
+		_connectionBtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if (_user.getAccount().equals(""))
+				{
+                	JTextField name = new JTextField();
+                    JPanel panel = new JPanel(new GridLayout(0, 1));
+                	panel.add(new JLabel("Identifiant :"));
+                    panel.add(name);
+                	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Veuillez entrer votre identifiant.",
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                	if (result == JOptionPane.OK_OPTION) {
+                		_user.setAccount(name.getText());
+                		// send to DB
+    					_connectionBtn.setText("Déconnection " + name.getText());
+    					// get users feed subscriptions and populate map
+    					
+    					_list.removeAll();
+    					initialize();
+                    } else {
+                        System.out.println("connexion Cancelled");
+                    }
+				} else {
+                    JPanel panel = new JPanel(new GridLayout(0, 1));
+                	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Voulez vous déconnecter l'utilisateur : " + _user.getAccount() + " ?",
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                	if (result == JOptionPane.OK_OPTION) {
+                		_user.setAccount("");
+                		// send to DB
+    					_connectionBtn.setText("Connection");
+    					// reset feed zone
+    					_pane.removeAll();
+    					try {
+							_pane.getDocument().remove(0, _pane.getDocument().getLength());
+						} catch (BadLocationException e) {
+							e.printStackTrace();
+						}
+    					// clear subscription map
+    					_user._feedMap.clear();
+    					_list.removeAll();
+    					_frame.revalidate();
+		            } else {
+		                System.out.println("deconnexion Cancelled");
+		            }
+				}
+			}
+		});
+		_registerBtn = new JButton("Cr\u00E9er un compte");
+		_registerBtn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+            	JTextField name = new JTextField();
+                JPanel panel = new JPanel(new GridLayout(0, 1));
+            	panel.add(new JLabel("Identifiant :"));
+                panel.add(name);
+            	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Veuillez entrer votre identifiant.",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            	if (result == JOptionPane.OK_OPTION) {
+            		_user.setAccount(name.getText());
+            		// send to DB
+					_list.removeAll();
+					initialize();
+                } else {
+                    System.out.println("register Cancelled");
+                }
+			}
+		});
 		_menuBar.add(menu1);
 		_menuBar.add(menu2);
+		_menuBar.add(horizontalGlue);
+		_menuBar.add(_connectionBtn);
 		_frame.setJMenuBar(_menuBar);
+		
+		_menuBar.add(_registerBtn);
 	}
 }
