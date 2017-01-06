@@ -45,7 +45,42 @@ public class ApplicationWindow {
 	private JMenuBar _menuBar;
 	private JScrollPane _scrollPane;
 	private JEditorPane _pane;
-	private Map<String, String> _feedMap;
+	private User _user;
+//	private Map<String, String> _feedMap;
+	
+	public class User
+	{
+		public Map<String, String>	_feedMap;
+		public String				account;
+		
+		public User() {
+			this._feedMap = new HashMap<String, String>();
+		}
+		public Map<String, String> getSubFeed() {
+			return this._feedMap;
+		}
+
+		public String getAccount() {
+			return this.account;
+		}
+		
+		public void setAccount(String acc) {
+			this.account = acc;
+		}
+
+		public void setSubFeed(HashMap<String, String> hashMap) {
+			this._feedMap = hashMap;
+		}
+
+		public void addFeed(String name, String url) {
+    		this._feedMap.put(name, url);
+		}
+
+		public void removeFeed(String name) {
+			this._feedMap.remove(name);
+		}
+
+	}
 
 	/**
 	 * Launch the application.
@@ -78,6 +113,7 @@ public class ApplicationWindow {
 	 */
 	private void initialize() {
 		_frame = new JFrame();
+		_user = new User();
 
 		setList();
 		setFeedZone();
@@ -89,7 +125,7 @@ public class ApplicationWindow {
         HTMLEditorKit editorKit = (HTMLEditorKit) _pane.getEditorKit();
 
         try {
-        	SyndFeed feeds = rssParser.getRSSContent(_feedMap.get(_list.getSelectedItem()));
+        	SyndFeed feeds = rssParser.getRSSContent(_user.getSubFeed().get(_list.getSelectedItem()));
 			_pane.setText("");
 
 			for (Iterator i = feeds.getEntries().iterator(); i.hasNext();) {
@@ -110,19 +146,19 @@ public class ApplicationWindow {
 		_list = new List();
 		_list.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				String feedUrl = _feedMap.get(_list.getSelectedItem());
+				String feedUrl = _user.getSubFeed().get(_list.getSelectedItem());
 				populatePane(feedUrl);
 			}
 		});
 		
-		_feedMap = new HashMap<String, String>();
+//		_user.setSubFeed(new HashMap<String, String>());
 		/* request server to get rss and push to map*/
-		_feedMap.put("rgagnon", "http://www.rgagnon.com/feed.xml");
-		_feedMap.put("xkcd.com", "http://xkcd.com/rss.xml");
-		_feedMap.put("inessential", "http://inessential.com/xml/rss.xml");
+		_user.addFeed("rgagnon", "http://www.rgagnon.com/feed.xml");
+		_user.addFeed("xkcd.com", "http://xkcd.com/rss.xml");
+		_user.addFeed("inessential", "http://inessential.com/xml/rss.xml");
 		
 		
-		for (String key : _feedMap.keySet())
+		for (String key : _user.getSubFeed().keySet())
 		{
 			_list.add(key);
 		}
@@ -154,7 +190,7 @@ public class ApplicationWindow {
 	                    	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Ajouter un flux RSS",
 	                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	                    	if (result == JOptionPane.OK_OPTION) {
-	                    		_feedMap.put(name.getText(), url.getText());
+	                    		_user.addFeed(name.getText(), url.getText());
 	                    		_list.add(name.getText());
 	                    		// send to DB
 	                        } else {
@@ -163,17 +199,18 @@ public class ApplicationWindow {
 	                    }
 	                });
 					JMenuItem delSub = new JMenuItem("Supprimer");
-					addSub.addActionListener(new ActionListener() {
+					delSub.addActionListener(new ActionListener() {
 	                    public void actionPerformed(ActionEvent e) {
 	                        JPanel panel = new JPanel(new GridLayout(0, 1));
-	                    	panel.add(new JLabel("Voulez-vous supprimer" + _list.getSelectedItem() + " ?"));
+	                    	panel.add(new JLabel("Voulez-vous supprimer : " + _list.getSelectedItem() + " ?"));
 	                    	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Ajouter un flux RSS",
 	                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 	                    	if (result == JOptionPane.OK_OPTION) {
-	                    		_feedMap.remove(_list.getSelectedItem());
+	                    		_user.removeFeed(_list.getSelectedItem());
 	                    		// send to DB
 	                    		_list.remove(_list.getSelectedItem());
 	                    		_list.select(0);
+	                    		populatePane(_list.getSelectedItem());
 	                        } else {
 	                            System.out.println("Cancelled");
 	                        }
