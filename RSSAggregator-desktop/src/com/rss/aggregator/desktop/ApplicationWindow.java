@@ -1,8 +1,11 @@
 package com.rss.aggregator.desktop;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.List;
@@ -12,13 +15,16 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
+import java.security.acl.Owner;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.swing.JDialog;
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,7 +37,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.Popup;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -42,16 +47,6 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.Component;
-
-import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.JButton;
-import java.awt.Font;
-import java.awt.Toolkit;
-import javax.swing.ImageIcon;
 
 public class ApplicationWindow {
 
@@ -100,6 +95,10 @@ public class ApplicationWindow {
 		}
 
 	}
+	   private int port = 2345;
+	   private String host = "127.0.0.1";
+	   private Thread t;
+	   private ClientConnexion _cliCon;
 
 	/**
 	 * Launch the application.
@@ -123,9 +122,9 @@ public class ApplicationWindow {
 	 * Create the application.
 	 */
 	public ApplicationWindow() {
+		_cliCon = new ClientConnexion(host, port);
 		_user = new User();
 		_frame = new JFrame();
-		_frame.setIconImage(Toolkit.getDefaultToolkit().getImage(ApplicationWindow.class.getResource("/resources/rss.ico")));
 		_list = new List();
 		_list.setFont(new Font("Dialog", Font.BOLD, 12));
 		_list.setForeground(Color.LIGHT_GRAY);
@@ -157,7 +156,7 @@ public class ApplicationWindow {
 				SyndEntry entry = (SyndEntry) i.next();
 	            editorKit.insertHTML(doc, doc.getLength(), "<h2><a href=\"" + entry.getLink() + "\">" +
 	            		entry.getTitle() + "</a></h2>", 0, 0, null);
-	            editorKit.insertHTML(doc, doc.getLength(), "<p>" + entry.getPublishedDate() + "</p></div>", 0, 0, null);
+	            editorKit.insertHTML(doc, doc.getLength(), "<div><p>" + entry.getPublishedDate() + "</p>", 0, 0, null);
 	            editorKit.insertHTML(doc, doc.getLength(), "<p>" + entry.getDescription().getValue() + "</p></div>", 0, 0, null);
 			}
         } catch (Exception e) {
@@ -274,7 +273,7 @@ public class ApplicationWindow {
 		});
 		_registerBtn = new JButton("Cr\u00E9er un compte");
 		 try {
-			 	Image img = ImageIO.read(getClass().getResource("/resources/users-add-user-icon.png"));
+			 	Image img = ImageIO.read(getClass().getResource("/resources/user-add.png"));
 			 	_registerBtn.setIcon(new ImageIcon(img.getScaledInstance(25, 25, 3)));
 		  } catch (Exception ex) {
 			    System.out.println(ex);
@@ -297,7 +296,7 @@ public class ApplicationWindow {
 		if (_user.getAccount().equals(""))
 		{
            	JTextField name = new JTextField();
-           	JTextField pwd = new JTextField();
+        	JPasswordField pwd = new JPasswordField();
             JPanel panel = new JPanel(new GridLayout(0, 1));
         	panel.add(new JLabel("Identifiant :"));
             panel.add(name);
@@ -306,6 +305,13 @@ public class ApplicationWindow {
         	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Veuillez entrer votre identifiant.",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         	if (result == JOptionPane.OK_OPTION) {
+
+        		_cliCon.connectUser(name.getText(), pwd.getPassword());
+//        	    for(int i = 0; i < 5; i++){
+//    		       t = new Thread(new ClientConnexion(host, port));
+//    		       t.start();
+//    		    }
+        	    
         		_user.setAccount(name.getText());
         		// send to DB
 				_connectionBtn.setText("Déconnection " + name.getText());
@@ -360,8 +366,9 @@ public class ApplicationWindow {
     	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Veuillez entrer votre identifiant.",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     	if (result == JOptionPane.OK_OPTION && Arrays.equals(pwd.getPassword(), pwdConfirm.getPassword())) {
-    		_user.setAccount(name.getText());
     		// send to DB
+    		_cliCon.createUser(name.getText(), pwd.getPassword());
+    		_user.setAccount(name.getText());
 			_list.removeAll();
 			initialize();
         } else if (result == JOptionPane.OK_OPTION && !(Arrays.equals(pwd.getPassword(), pwdConfirm.getPassword()))) {
@@ -373,6 +380,12 @@ public class ApplicationWindow {
 	
 	private void drawSubMenu(JPopupMenu popMenu) {
 		JMenuItem addSub = new JMenuItem("Add a subscription");
+		 try {
+			 	Image img = ImageIO.read(getClass().getResource("/resources/rss-add.png"));
+			 	addSub.setIcon(new ImageIcon(img.getScaledInstance(25, 25, 3)));
+		  } catch (Exception ex) {
+			    System.out.println(ex);
+		  }
 		addSub.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
         		_frame.revalidate();
@@ -389,12 +402,19 @@ public class ApplicationWindow {
             		_user.addFeed(name.getText(), url.getText());
             		_list.add(name.getText());
             		// send to DB
+            		_cliCon.addRSS(_user.account, name.getText(), url.getText());
                 } else {
                     System.out.println("add sub Cancelled");
                 }
             }
         });
 		JMenuItem delSub = new JMenuItem("Supprimer");
+		 try {
+			 	Image img = ImageIO.read(getClass().getResource("/resources/rss-remove.png"));
+			 	delSub.setIcon(new ImageIcon(img.getScaledInstance(25, 25, 3)));
+		  } catch (Exception ex) {
+			    System.out.println(ex);
+		  }
 		delSub.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
         		_frame.revalidate();
@@ -405,6 +425,7 @@ public class ApplicationWindow {
             	if (result == JOptionPane.OK_OPTION) {
             		_user.removeFeed(_list.getSelectedItem());
             		// send to DB
+            		_cliCon.delRSS(_user.account, _list.getSelectedItem());
             		_list.remove(_list.getSelectedItem());
             		_list.select(0);
             		populatePane(_list.getSelectedItem());
