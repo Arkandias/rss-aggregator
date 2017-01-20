@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.SQLException;
 
 import org.apache.commons.validator.routines.UrlValidator;
 
@@ -17,6 +18,12 @@ public class ClientProcessor implements Runnable {
 
 	public ClientProcessor(Socket pSock) {
 		sock = pSock;
+		try {
+			_dbMan = new DatabaseManager();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// Le traitement lancé dans un thread séparé
@@ -30,6 +37,7 @@ public class ClientProcessor implements Runnable {
 				reader = new BufferedInputStream(sock.getInputStream());
 				// On attend la demande du client
 				String response = read();
+				/*
 				InetSocketAddress remote = (InetSocketAddress) sock.getRemoteSocketAddress();
 
 				String debug = "";
@@ -38,18 +46,20 @@ public class ClientProcessor implements Runnable {
 				debug += " Sur le port : " + remote.getPort() + ".\n";
 				debug += "\t -> Commande reçue : " + response + "\n";
 				System.err.println("\n" + debug);
-
+*/
 				String toSend = "";
 
+				System.err.println("choose action with : " + response);
 				if (response.startsWith("create"))
-					createUser(response.substring(8));
+					toSend = createUser(response.substring(8));
 				else if (response.startsWith("connect"))
-					connectUser(response.substring(8));
+					toSend = connectUser(response.substring(8));
 				else if (response.startsWith("addRSS"))
-					addRSS(response.substring(7));
+					toSend = addRSS(response.substring(7));
 				else if (response.startsWith("delRSS"))
-					deleteRSS(response.substring(7));
+					toSend = deleteRSS(response.substring(7));
 
+				System.err.println("\nTo send : " + toSend);
 				writer.write(toSend);
 				writer.flush();
 
@@ -69,21 +79,21 @@ public class ClientProcessor implements Runnable {
 		}
 	}
 
-	private void createUser(String userInfos) {
+	private String createUser(String userInfos) {
 		String[] divInfos = userInfos.split("&");
 		String userName = divInfos[0].split("=")[1];
 		String userPwd = divInfos[1].split("=")[1];
 		System.err.println("User to create :  " + userName + " --- " + userPwd);
-		_dbMan.addUser(userName, userPwd);
+		return _dbMan.addUser(userName, userPwd);
 		// check if user don't exists yet and create it if not
 	}
 
-	private void connectUser(String userInfos) {
+	private String connectUser(String userInfos) {
 		String[] divInfos = userInfos.split("&");
 		String userName = divInfos[0].split("=")[1];
 		String userPwd = divInfos[1].split("=")[1];
 		System.err.println("User to login :  " + userName + " --- " + userPwd);
-		_dbMan.checkUser(userName, userPwd);
+		return "User created: " + _dbMan.checkUser(userName, userPwd);
 		// get user in DB and send rss
 	}
 
@@ -109,12 +119,12 @@ public class ClientProcessor implements Runnable {
 		return "RSS succesfully added.";
 	}
 
-	private void deleteRSS(String infos) {
+	private String deleteRSS(String infos) {
 		String[] divInfos = infos.split("&");
 		String userName = divInfos[0].split("=")[1];
 		String rssName = divInfos[1].split("=")[1];
 		System.err.println("User del rss :  " + userName + " =>" + rssName);
-		_dbMan.delRSS(userName, rssName);
+		return _dbMan.delRSS(userName, rssName);
 	}
 
 	// La méthode que nous utilisons pour lire les réponses

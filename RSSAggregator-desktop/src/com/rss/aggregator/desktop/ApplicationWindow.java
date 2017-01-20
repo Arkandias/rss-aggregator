@@ -135,7 +135,7 @@ public class ApplicationWindow {
 	}
 
 	private void getConfig() {
-		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.congig");
+		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
 		_host = res.getString("rssAggreg.host");
 		_port = Integer.parseInt(res.getString("rssAggreg.port"));
 		_cliCon = new ClientConnexion(_host, _port);

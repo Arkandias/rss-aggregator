@@ -13,7 +13,7 @@ import TimeServer;
 */
 public class ServerMain {
 	public static void main(String[] args) throws Exception {
-		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.congig");
+		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
 		String host = res.getString("rssAggreg.host");
 		int port = Integer.parseInt(res.getString("rssAggreg.port"));
 	    

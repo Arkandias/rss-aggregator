@@ -18,7 +18,7 @@ public class DatabaseManager {
 	private String _url;
 
 	public DatabaseManager() throws SQLException {
-		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.congig");
+		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
 		_user = res.getString("rssAggreg.user");
 		_pwd = res.getString("rssAggreg.pwd");
 		_url = res.getString("rssAggreg.url");
@@ -79,7 +79,7 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return "";
+		return "OK";
 	}
 	
 	public String checkRSS(String rssName, String rssURL) {

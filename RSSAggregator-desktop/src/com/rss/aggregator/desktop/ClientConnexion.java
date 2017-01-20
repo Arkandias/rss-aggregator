@@ -16,12 +16,16 @@ public class ClientConnexion implements Runnable {
 
 	// Notre liste de commandes. Le serveur nous répondra différemment selon la
 	// commande utilisée.
-	private String[] listCommands = { "FULL", "DATE", "HOUR", "NONE" };
+//	private String[] listCommands = { "FULL", "DATE", "HOUR", "NONE" };
 	private static int count = 0;
 	private String name = "Client-";
+	private String _command;
+	private int _req;
 
-	public ClientConnexion(String host, int port) {
+	public ClientConnexion(String host, int port){//, int req, String command) {
 		name += ++count;
+//		_req = req;
+//		_command = command;
 		try {
 			_connexion = new Socket(host, port);
 		} catch (UnknownHostException e) {
@@ -66,6 +70,7 @@ public class ClientConnexion implements Runnable {
 			writer.write("create?user=" + userName + "&pwd="
 			+ Arrays.toString(userPwd).replace(", ", "").substring(1, Arrays.toString(userPwd).replace(", ", "").length() - 1));
 			writer.flush();
+			System.out.println("\t Wait for response !!!");
 			String response = read();
 			System.out.println("\t * " + name + " : Réponse reçue " + response);
 			
@@ -121,13 +126,13 @@ public class ClientConnexion implements Runnable {
 				reader = new BufferedInputStream(_connexion.getInputStream());
 				// On envoie la commande au serveur
 
-				String commande = getCommand();
-				writer.write(commande);
+//				String commande = getCommand();
+				writer.write(_command);
 				// TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS
 				// AU SERVEUR
 				writer.flush();
 
-				System.out.println("Commande " + commande + " envoyée au serveur");
+				System.out.println("Commande " + _command + " envoyée au serveur");
 
 				// On attend la réponse
 				String response = read();
@@ -149,10 +154,10 @@ public class ClientConnexion implements Runnable {
 	}
 
 	// Méthode qui permet d'envoyer des commandeS de façon aléatoire
-	private String getCommand() {
-		Random rand = new Random();
-		return listCommands[rand.nextInt(listCommands.length)];
-	}
+//	private String getCommand() {
+//		Random rand = new Random();
+//		return listCommands[rand.nextInt(listCommands.length)];
+//	}
 
 	// Méthode pour lire les réponses du serveur
 	private String read() throws IOException {
