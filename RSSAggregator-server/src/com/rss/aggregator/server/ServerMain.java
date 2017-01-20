@@ -5,15 +5,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ResourceBundle;
+
 /*
 import ClientConnexion;
 import TimeServer;
 */
 public class ServerMain {
 	public static void main(String[] args) throws Exception {
-
-		String host = "127.0.0.1";
-	    int port = 2345;
+		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.congig");
+		String host = res.getString("rssAggreg.host");
+		int port = Integer.parseInt(res.getString("rssAggreg.port"));
 	    
 	    RSSServer ts = new RSSServer(host, port);
 	    ts.open();

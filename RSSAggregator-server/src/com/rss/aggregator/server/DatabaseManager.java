@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ResourceBundle;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -12,11 +13,16 @@ import java.sql.ResultSet;
 
 public class DatabaseManager {
 
-	private String _user = "root";
-	private String _pwd = "toor";
-	private String _url = "jdbc:mysql://localhost:3306/rssaggregatordb";
+	private String _user;
+	private String _pwd;
+	private String _url;
 
 	public DatabaseManager() throws SQLException {
+		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.congig");
+		_user = res.getString("rssAggreg.user");
+		_pwd = res.getString("rssAggreg.pwd");
+		_url = res.getString("rssAggreg.url");
+
 //		MysqlDataSource dataSource = new MysqlDataSource();
 //		dataSource.setUser(_user);
 //		dataSource.setPassword(_pwd);
