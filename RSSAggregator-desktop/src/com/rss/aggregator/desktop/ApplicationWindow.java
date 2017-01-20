@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -94,8 +95,8 @@ public class ApplicationWindow {
 		}
 
 	}
-	   private int port = 2345;
-	   private String host = "127.0.0.1";
+	   private int _port;// = 2345;
+	   private String _host;// = "127.0.0.1";
 	   private Thread t;
 	   private ClientConnexion _cliCon;
 
@@ -121,7 +122,7 @@ public class ApplicationWindow {
 	 * Create the application.
 	 */
 	public ApplicationWindow() {
-		_cliCon = new ClientConnexion(host, port);
+		getConfig();
 		_user = new User();
 		_frame = new JFrame();
 		_list = new List();
@@ -131,6 +132,13 @@ public class ApplicationWindow {
 
 		initialize();
 		setMenu();
+	}
+
+	private void getConfig() {
+		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.congig");
+		_host = res.getString("rssAggreg.host");
+		_port = Integer.parseInt(res.getString("rssAggreg.port"));
+		_cliCon = new ClientConnexion(_host, _port);
 	}
 
 	/**

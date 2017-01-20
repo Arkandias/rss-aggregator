@@ -1,3 +1,4 @@
+package com.rss.aggregator.server;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
