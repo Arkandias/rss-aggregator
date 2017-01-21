@@ -82,7 +82,7 @@ public class ClientConnexion implements Runnable {
 		try {
 			writer = new PrintWriter(_connexion.getOutputStream(), true);
 			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("create?user=" + userId + "&rssName=" + rssName + "&rssUrl=" + rssURL);
+			writer.write("addRSS?user=" + userId + "&rssName=" + rssName + "&rssUrl=" + rssURL);
 			writer.flush();
 			String response = read();
 			System.out.println("\t * " + name + " : Réponse reçue " + response);
@@ -99,7 +99,7 @@ public class ClientConnexion implements Runnable {
 		try {
 			writer = new PrintWriter(_connexion.getOutputStream(), true);
 			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("create?user=" + userId + "&rssName=" + rssName);
+			writer.write("delRSS?user=" + userId + "&rssName=" + rssName);
 			writer.flush();
 			String response = read();
 			System.out.println("\t * " + name + " : Réponse reçue " + response);

@@ -157,15 +157,19 @@ public class ApplicationWindow {
         HTMLEditorKit editorKit = (HTMLEditorKit) _pane.getEditorKit();
 
         try {
-        	SyndFeed feeds = rssParser.getRSSContent(_user.getSubFeed().get(_list.getSelectedItem()));
+        	SyndFeed feeds = null;
+        	if (!_user.account.isEmpty())
+        		feeds = rssParser.getRSSContent(_user.getSubFeed().get(_list.getSelectedItem()));
+        	
 			_pane.setText("");
-
-			for (Iterator i = feeds.getEntries().iterator(); i.hasNext();) {
-				SyndEntry entry = (SyndEntry) i.next();
-	            editorKit.insertHTML(doc, doc.getLength(), "<h2><a href=\"" + entry.getLink() + "\">" +
-	            		entry.getTitle() + "</a></h2>", 0, 0, null);
-	            editorKit.insertHTML(doc, doc.getLength(), "<div><p>" + entry.getPublishedDate() + "</p>", 0, 0, null);
-	            editorKit.insertHTML(doc, doc.getLength(), "<p>" + entry.getDescription().getValue() + "</p></div>", 0, 0, null);
+			if (feeds != null) {
+				for (Iterator i = feeds.getEntries().iterator(); i.hasNext();) {
+					SyndEntry entry = (SyndEntry) i.next();
+		            editorKit.insertHTML(doc, doc.getLength(), "<h2><a href=\"" + entry.getLink() + "\">" +
+		            		entry.getTitle() + "</a></h2>", 0, 0, null);
+		            editorKit.insertHTML(doc, doc.getLength(), "<div><p>" + entry.getPublishedDate() + "</p>", 0, 0, null);
+		            editorKit.insertHTML(doc, doc.getLength(), "<p>" + entry.getDescription().getValue() + "</p></div>", 0, 0, null);
+				}
 			}
         } catch (Exception e) {
             ((Throwable) e).printStackTrace();
@@ -175,10 +179,11 @@ public class ApplicationWindow {
 
 	private void setList() {
 		/* request server to get rss and push to map*/
+		/*
 		_user.addFeed("rgagnon", "http://www.rgagnon.com/feed.xml");
 		_user.addFeed("xkcd.com", "http://xkcd.com/rss.xml");
 		_user.addFeed("inessential", "http://inessential.com/xml/rss.xml");
-		
+		*/
 		_list.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				String feedUrl = _user.getSubFeed().get(_list.getSelectedItem());
@@ -186,8 +191,11 @@ public class ApplicationWindow {
 			}
 		});
 
-		for (String key : _user.getSubFeed().keySet()) {
-			_list.add(key);
+		if (!_user.account.isEmpty())
+		{
+			for (String key : _user.getSubFeed().keySet()) {
+				_list.add(key);
+			}
 		}
 
 		_list.addMouseListener(new MouseAdapter() {
@@ -320,9 +328,11 @@ public class ApplicationWindow {
             		_user.setAccount(name.getText());
     				_connectionBtn.setText("Déconnection " + name.getText());
         			// set user id with the response
-    				_user.id = response.substring(response.indexOf(":"), response.indexOf(",")).split("=")[1];
+    				_user.id = response.substring(response.indexOf(":"), response.indexOf(",") == -1 ? response.length() : response.indexOf(",")).split("=")[1];
     				// get users feed subscriptions and populate map with the response
     				_list.removeAll();
+    				if (response.contains(",rss["))
+    					setUserSubFeed(response);
     				initialize();
         			messageInfo("User successfully connected");
         		}
@@ -356,6 +366,16 @@ public class ApplicationWindow {
             } else {
                 System.out.println("deconnexion Cancelled");
             }
+		}
+	}
+
+	private void setUserSubFeed(String response) {
+		response = response.substring(response.lastIndexOf("["));
+		String[] feeds = response.split(";");
+		for (String feed : feeds)
+		{
+			String[] feedPart = feed.split("&");
+			_user._feedMap.put(feedPart[0].split("=")[1], feedPart[1].split("=")[1]);
 		}
 	}
 
@@ -430,6 +450,7 @@ public class ApplicationWindow {
             		_user.addFeed(name.getText(), url.getText());
             		_list.add(name.getText());
             		// send to DB
+            		System.err.println("userId : " + _user.id);
             		_cliCon.addRSS(_user.id, name.getText(), url.getText());
                 } else {
                     System.out.println("add sub Cancelled");
@@ -448,7 +469,7 @@ public class ApplicationWindow {
         		_frame.revalidate();
                 JPanel panel = new JPanel(new GridLayout(0, 1));
             	panel.add(new JLabel("Voulez-vous supprimer : " + _list.getSelectedItem() + " ?"));
-            	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Ajouter un flux RSS",
+            	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Supprimer un flux RSS",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             	if (result == JOptionPane.OK_OPTION) {
             		_user.removeFeed(_list.getSelectedItem());

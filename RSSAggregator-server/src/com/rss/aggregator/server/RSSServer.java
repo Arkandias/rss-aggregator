@@ -9,13 +9,15 @@ import java.net.UnknownHostException;
 public class RSSServer {
 
    private int port = 2345;
-   private String host = "127.0.0.1";
+   private String host = "localhost";
+//   private String host = "127.0.0.1";
    private ServerSocket server = null;
    private boolean isRunning = true;
    
    public RSSServer(){
       try {
-         server = new ServerSocket(port, 100, InetAddress.getByName(host));
+        server = new ServerSocket(port, 100, InetAddress.getByName(host));
+//        server = new ServerSocket(port, 100, InetAddress.getLocalHost());
       } catch (UnknownHostException e) {
          e.printStackTrace();
       } catch (IOException e) {
@@ -27,7 +29,8 @@ public class RSSServer {
       host = pHost;
       port = pPort;
       try {
-         server = new ServerSocket(port, 100, InetAddress.getByName(host));
+        server = new ServerSocket(port, 100, InetAddress.getByName(host));
+//        server = new ServerSocket(port, 100, InetAddress.getLocalHost());
       } catch (UnknownHostException e) {
          e.printStackTrace();
       } catch (IOException e) {

@@ -16,7 +16,7 @@ public class ServerMain {
 		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
 		String host = res.getString("rssAggreg.host");
 		int port = Integer.parseInt(res.getString("rssAggreg.port"));
-	    
+	    System.out.println("host :" + host);
 	    RSSServer ts = new RSSServer(host, port);
 	    ts.open();
 	    

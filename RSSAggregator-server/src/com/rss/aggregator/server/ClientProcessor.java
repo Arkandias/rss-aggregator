@@ -93,20 +93,20 @@ public class ClientProcessor implements Runnable {
 		String userName = divInfos[0].split("=")[1];
 		String userPwd = divInfos[1].split("=")[1];
 		System.err.println("User to login :  " + userName + " --- " + userPwd);
-		return "userAdd: " + _dbMan.checkUser(userName, userPwd, 0);
+		return _dbMan.checkUser(userName, userPwd, 0);
 		// get user in DB and send rss
 	}
 
 	private String addRSS(String infos) {
 		String[] divInfos = infos.split("&");
-		String userName = divInfos[0].split("=")[1];
+		String userId = divInfos[0].split("=")[1];
 		String rssName = divInfos[1].split("=")[1];
 		String rssUrl = divInfos[2].split("=")[1];
-		System.err.println("User add rss :  " + userName + " =>" + rssName + " -- " + rssUrl);
+		System.err.println("User add rss :  " + userId + " =>" + rssName + " -- " + rssUrl);
 		// check if rss is valid
 		// if it is add it to the user
 		// otherwise send notification to user
-		return checkRss(rssUrl) ? addRSSToDB(userName, rssName, rssUrl) : "Cannot add the rss, the URL is not valid";
+		return checkRss(rssUrl) ? addRSSToDB(userId, rssName, rssUrl) : "KO:Cannot add the rss, the URL is not valid";
 	}
 
 	private Boolean checkRss(String rssUrl){
@@ -115,16 +115,15 @@ public class ClientProcessor implements Runnable {
 	}
 
 	private String addRSSToDB(String userName, String rssName, String rssUrl) {
-		_dbMan.addRSS(userName, rssName, rssUrl);
-		return "RSS succesfully added.";
+		return _dbMan.addRSS(userName, rssName, rssUrl);
 	}
 
 	private String deleteRSS(String infos) {
 		String[] divInfos = infos.split("&");
-		String userName = divInfos[0].split("=")[1];
+		String userId = divInfos[0].split("=")[1];
 		String rssName = divInfos[1].split("=")[1];
-		System.err.println("User del rss :  " + userName + " =>" + rssName);
-		return _dbMan.delRSS(userName, rssName);
+		System.err.println("User del rss :  " + userId + " =>" + rssName);
+		return _dbMan.delRSS(userId, rssName);
 	}
 
 	// La méthode que nous utilisons pour lire les réponses

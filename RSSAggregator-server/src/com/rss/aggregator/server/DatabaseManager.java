@@ -59,35 +59,7 @@ public class DatabaseManager {
 			else
 			{
 				ret = "OK:id=" + id;
-				// retrieve rssIds
-				List<String> rssIds = new ArrayList<String>();
-				// get rss linked
-				sqlQuery = "SELECT * from user_domain_assoc WHERE user_id LIKE ?";
-				stmt = connexion.prepareStatement(sqlQuery);
-				stmt.setString(1, id);
-				res =  stmt.executeQuery();
-				while (res.next())
-					rssIds.add(res.getString("id"));
-				stmt.close();
-				// retrieve rss
-				Map<String, String> rss = new HashMap<String, String>();
-				// get rss linked
-				sqlQuery = "SELECT * from rss_domain WHERE ";
-				int a;
-				for (a = 0; a < rssIds.size(); a++) {
-					sqlQuery += (a > 0 ? " AND " : "");
-					sqlQuery += "id Like ?";
-				}
-				stmt = connexion.prepareStatement(sqlQuery);
-				for (int j = 0; j < rssIds.size(); j++) {
-					stmt.setString(j + 1, rssIds.get(j));
-				}
-				res =  stmt.executeQuery();
-				ret += ",rss:";
-				while (res.next()) {
-					ret += "title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
-					rss.put(res.getString("link"), res.getString("title"));
-				}
+				ret += getLinkedRss(id, connexion);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -102,6 +74,51 @@ public class DatabaseManager {
 		return ret;
 	}
 	
+	private String getLinkedRss(String userId, Connection connexion) throws SQLException {
+		String ret = null;
+		String sqlQuery = null;
+		PreparedStatement stmt = null;
+		// retrieve rssIds
+		List<String> rssIds = new ArrayList<String>();
+		// get rss linked
+		sqlQuery = "SELECT * FROM rss_domain RSS, user_domain_assoc ASSOC WHERE ASSOC.user_id = ? AND ASSOC.rss_domain_id = RSS.id";
+
+//		sqlQuery = "SELECT * from user_domain_assoc WHERE user_id LIKE ?";
+		stmt = connexion.prepareStatement(sqlQuery);
+		stmt.setString(1, userId);
+		ResultSet res =  stmt.executeQuery();
+		ret = ",rss[";
+		while (res.next()) {
+			ret += "title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
+//			rss.put(res.getString("link"), res.getString("title"));
+		}
+
+	/*	
+		while (res.next())
+		{
+			rssIds.add(res.getString("id"));
+			System.out.println("rssId = " + res.getString("id"));
+		}
+		stmt.close();
+		// retrieve rss
+		Map<String, String> rss = new HashMap<String, String>();
+		// get rss linked
+//		int a;
+		System.out.println("Id list size = " + rssIds.size());
+		for (int a = 0; a < rssIds.size(); a++) {
+			sqlQuery += a == 0 ? " SELECT * from rss_domain WHERE " : "";
+			sqlQuery += (a > 0 ? " AND " : "");
+			sqlQuery += "id Like ?";
+		}
+		stmt = connexion.prepareStatement(sqlQuery);
+		for (int j = 0; j < rssIds.size(); j++) {
+			stmt.setString(j + 1, rssIds.get(j));
+		}
+		res =  stmt.executeQuery();
+		*/
+		return ret;
+	}
+
 	public String addUser(String userName, String userPwd) {
 		
 		checkUser(userName, userPwd, 1);
@@ -162,27 +179,34 @@ public class DatabaseManager {
 	public String addRSS(String userId, String rssName, String rssURL){
 		Connection connexion = null;
 		PreparedStatement stmt = null;
-		String id = null;
+		String rssId = null;
 		String response = null;
+		String ret = null;
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
 			response = checkRSS(rssName, rssURL);
 			if (response.startsWith("KO"))
 			{
-				String sqlQuery = "INSERT INTO rsss_domain (title, link) VALUES (?, ?)";
+				String sqlQuery = "INSERT INTO rss_domain (title, link) VALUES (?, ?)";
 				stmt = connexion.prepareStatement(sqlQuery);
 				stmt.setString(1, rssName);
 				stmt.setString(2, rssURL);
 				int res =  stmt.executeUpdate();
 				stmt.close();
 				response = checkRSS(rssName, rssURL);
-				id = response.substring(response.indexOf("="));
 			}
-			else
+			// get the id of rss if exists
+			rssId = response.substring(response.indexOf("=") + 1);
+			if (!checkIfAlreadyLinked(userId, rssId))
 			{
-				// get the id of rss if exists
-				id = response.substring(response.indexOf("="));
+				String sqlQuery = "INSERT INTO user_domain_assoc (user_id, rss_domain_id) VALUES (?, ?)";
+				stmt = connexion.prepareStatement(sqlQuery);
+				stmt.setString(1, userId);
+				stmt.setString(2, rssId);
+				stmt.executeUpdate();
 			}
+			ret = "OK:";
+			ret += getLinkedRss(userId, connexion);
 			// link user to rss
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -194,9 +218,29 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return "OK";
+		return ret;
 	}
 	
+	private boolean checkIfAlreadyLinked(String userId, String rssId) {
+		Connection connexion = null;
+		PreparedStatement stmt = null;
+		try {
+			connexion = DriverManager.getConnection(_url, _user, _pwd);
+			String sqlQuery = "SELECT * FROM user_domain_assoc WHERE user_id = ? AND rss_domain_id = ?";
+			stmt = connexion.prepareStatement(sqlQuery);
+			stmt.setString(1, userId);
+			stmt.setString(2, rssId);
+			ResultSet res = stmt.executeQuery();
+			int i = 0;
+			while (res.next())
+				i++;
+			return i > 0 ? true : false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	public String delRSS(String userId, String rssName) {
 		Connection connexion = null;
 		PreparedStatement stmt = null;
