@@ -83,7 +83,7 @@ public class DatabaseManager {
 					stmt.setString(j + 1, rssIds.get(j));
 				}
 				res =  stmt.executeQuery();
-				ret += "rss:";
+				ret += ",rss:";
 				while (res.next()) {
 					ret += "title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
 					rss.put(res.getString("link"), res.getString("title"));

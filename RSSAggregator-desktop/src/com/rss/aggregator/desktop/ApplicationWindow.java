@@ -65,6 +65,7 @@ public class ApplicationWindow {
 	{
 		public Map<String, String>	_feedMap;
 		public String				account;
+		public String				id;
 		
 		public User() {
 			this._feedMap = new HashMap<String, String>();
@@ -315,24 +316,21 @@ public class ApplicationWindow {
         		String response = _cliCon.connectUser(name.getText(), pwd.getPassword());
         		if (response.startsWith("OK"))
         		{
-        			//user created
+        			// user connected
+            		_user.setAccount(name.getText());
+    				_connectionBtn.setText("Déconnection " + name.getText());
+        			// set user id with the response
+    				_user.id = response.substring(response.indexOf(":"), response.indexOf(",")).split("=")[1];
+    				// get users feed subscriptions and populate map with the response
+    				_list.removeAll();
+    				initialize();
+        			messageInfo("User successfully connected");
         		}
         		else
         		{
-        			//user was not create
+        			//user was not connected
         		}
-//        	    for(int i = 0; i < 5; i++){
-//    		       t = new Thread(new ClientConnexion(host, port));
-//    		       t.start();
-//    		    }
-        	    
-        		_user.setAccount(name.getText());
-        		// send to DB
-				_connectionBtn.setText("Déconnection " + name.getText());
-				// get users feed subscriptions and populate map
 				
-				_list.removeAll();
-				initialize();
             } else {
                 System.out.println("connexion Cancelled");
             }
@@ -384,7 +382,8 @@ public class ApplicationWindow {
     		String response = _cliCon.createUser(name.getText(), pwd.getPassword());
     		if (response.startsWith("OK"))
     		{
-    			//user created
+    			// user created
+    			messageInfo("User successfully created");
     		}
     		else
     		{
@@ -400,6 +399,13 @@ public class ApplicationWindow {
         }
 	}
 	
+	private void messageInfo(String msg) {
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+    	panel.add(new JLabel(msg));
+    	JOptionPane.showConfirmDialog(null, panel, "Information",
+                JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
+	}
+
 	private void drawSubMenu(JPopupMenu popMenu) {
 		JMenuItem addSub = new JMenuItem("Add a subscription");
 		 try {
@@ -424,7 +430,7 @@ public class ApplicationWindow {
             		_user.addFeed(name.getText(), url.getText());
             		_list.add(name.getText());
             		// send to DB
-            		_cliCon.addRSS(_user.account, name.getText(), url.getText());
+            		_cliCon.addRSS(_user.id, name.getText(), url.getText());
                 } else {
                     System.out.println("add sub Cancelled");
                 }
@@ -447,7 +453,7 @@ public class ApplicationWindow {
             	if (result == JOptionPane.OK_OPTION) {
             		_user.removeFeed(_list.getSelectedItem());
             		// send to DB
-            		_cliCon.delRSS(_user.account, _list.getSelectedItem());
+            		_cliCon.delRSS(_user.id, _list.getSelectedItem());
             		_list.remove(_list.getSelectedItem());
             		_list.select(0);
             		populatePane(_list.getSelectedItem());
