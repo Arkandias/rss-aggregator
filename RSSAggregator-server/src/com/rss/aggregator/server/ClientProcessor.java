@@ -84,7 +84,7 @@ public class ClientProcessor implements Runnable {
 		String userName = divInfos[0].split("=")[1];
 		String userPwd = divInfos[1].split("=")[1];
 		System.err.println("User to create :  " + userName + " --- " + userPwd);
-		return _dbMan.addUser(userName, userPwd);
+		return "userCreation:" + _dbMan.addUser(userName, userPwd);
 		// check if user don't exists yet and create it if not
 	}
 
@@ -93,7 +93,7 @@ public class ClientProcessor implements Runnable {
 		String userName = divInfos[0].split("=")[1];
 		String userPwd = divInfos[1].split("=")[1];
 		System.err.println("User to login :  " + userName + " --- " + userPwd);
-		return "User created: " + _dbMan.checkUser(userName, userPwd);
+		return "userAdd: " + _dbMan.checkUser(userName, userPwd, 0);
 		// get user in DB and send rss
 	}
 

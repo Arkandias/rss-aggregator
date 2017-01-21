@@ -312,8 +312,15 @@ public class ApplicationWindow {
         	int result = (int)JOptionPane.showConfirmDialog(null, panel, "Veuillez entrer votre identifiant.",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         	if (result == JOptionPane.OK_OPTION) {
-
-        		_cliCon.connectUser(name.getText(), pwd.getPassword());
+        		String response = _cliCon.connectUser(name.getText(), pwd.getPassword());
+        		if (response.startsWith("OK"))
+        		{
+        			//user created
+        		}
+        		else
+        		{
+        			//user was not create
+        		}
 //        	    for(int i = 0; i < 5; i++){
 //    		       t = new Thread(new ClientConnexion(host, port));
 //    		       t.start();
@@ -374,8 +381,16 @@ public class ApplicationWindow {
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     	if (result == JOptionPane.OK_OPTION && Arrays.equals(pwd.getPassword(), pwdConfirm.getPassword())) {
     		// send to DB
-    		_cliCon.createUser(name.getText(), pwd.getPassword());
-    		_user.setAccount(name.getText());
+    		String response = _cliCon.createUser(name.getText(), pwd.getPassword());
+    		if (response.startsWith("OK"))
+    		{
+    			//user created
+    		}
+    		else
+    		{
+    			//user was not create
+    		}
+//    		_user.setAccount(name.getText());
 			_list.removeAll();
 			initialize();
         } else if (result == JOptionPane.OK_OPTION && !(Arrays.equals(pwd.getPassword(), pwdConfirm.getPassword()))) {

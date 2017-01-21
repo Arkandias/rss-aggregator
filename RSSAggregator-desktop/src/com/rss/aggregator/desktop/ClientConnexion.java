@@ -14,18 +14,12 @@ public class ClientConnexion implements Runnable {
 	private PrintWriter writer = null;
 	private BufferedInputStream reader = null;
 
-	// Notre liste de commandes. Le serveur nous répondra différemment selon la
-	// commande utilisée.
-//	private String[] listCommands = { "FULL", "DATE", "HOUR", "NONE" };
 	private static int count = 0;
 	private String name = "Client-";
 	private String _command;
-	private int _req;
 
-	public ClientConnexion(String host, int port){//, int req, String command) {
+	public ClientConnexion(String host, int port){
 		name += ++count;
-//		_req = req;
-//		_command = command;
 		try {
 			_connexion = new Socket(host, port);
 		} catch (UnknownHostException e) {
@@ -47,7 +41,7 @@ public class ClientConnexion implements Runnable {
 		connectUser(userName, userPwd);
 	}
 
-	public void connectUser(String userName, char[] userPwd) {
+	public String connectUser(String userName, char[] userPwd) {
 		try {
 			writer = new PrintWriter(_connexion.getOutputStream(), true);
 			reader = new BufferedInputStream(_connexion.getInputStream());
@@ -56,14 +50,15 @@ public class ClientConnexion implements Runnable {
 			writer.flush();
 			String response = read();
 			System.out.println("\t * " + name + " : Réponse reçue " + response);
-			
+			return response;
 			// send the response
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		return "KO";
 	}
 
-	public void createUser(String userName, char[] userPwd) {
+	public String createUser(String userName, char[] userPwd) {
 		try {
 			writer = new PrintWriter(_connexion.getOutputStream(), true);
 			reader = new BufferedInputStream(_connexion.getInputStream());
@@ -73,43 +68,48 @@ public class ClientConnexion implements Runnable {
 			System.out.println("\t Wait for response !!!");
 			String response = read();
 			System.out.println("\t * " + name + " : Réponse reçue " + response);
+			return response;
 			
 			// send the response
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		return "KO";
 	}
 	
 
-	public void addRSS(String userName, String rssName, String rssURL) {
+	public String addRSS(String userId, String rssName, String rssURL) {
 		try {
 			writer = new PrintWriter(_connexion.getOutputStream(), true);
 			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("create?user=" + userName + "&rssName=" + rssName + "&rssUrl=" + rssURL);
+			writer.write("create?user=" + userId + "&rssName=" + rssName + "&rssUrl=" + rssURL);
 			writer.flush();
 			String response = read();
 			System.out.println("\t * " + name + " : Réponse reçue " + response);
-			
+			return response;
 			// send the response
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		return "KO";
 	}
 
 
-	public void delRSS(String userName, String rssName) {
+	public String delRSS(String userId, String rssName) {
 		try {
 			writer = new PrintWriter(_connexion.getOutputStream(), true);
 			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("create?user=" + userName + "&rssName=" + rssName);
+			writer.write("create?user=" + userId + "&rssName=" + rssName);
 			writer.flush();
 			String response = read();
 			System.out.println("\t * " + name + " : Réponse reçue " + response);
+			return response;
 			
 			// send the response
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		return "KO";
 	}
 	
 	public void run() {
