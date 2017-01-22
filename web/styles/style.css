@@ -1,0 +1,156 @@
+html, body, h1, h2, h3, p {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	width: 100%;
+	background-color: #fefff4;
+}
+
+body, body * {
+	position: relative;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#title {
+	position: relative;
+	width: 400px;
+	margin: auto;
+	margin-top: -10px;
+	margin-bottom: 30px;
+	padding-top: 15px;
+	padding-bottom: 10px;
+	border: 2px solid grey;
+	border-radius: 10px;
+	text-align: center;
+	font-weight: 700;
+	font-size: 2em;
+	font-family: "Black Ops One";
+}
+
+#search-div {
+	height: 30px;
+	width: 600px;
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#search-div > * {
+	display: inline-block;
+}
+
+#search-div > input[type='search'] {
+	width: 80%;
+	float: left;
+}
+
+#search-div > input[type='button'] {
+	width: 15%;
+	float: right;
+}
+
+.centered-content {
+	text-align: center;
+	margin: auto;
+	margin-top: 20vh;
+	width: 250px;
+}
+
+#login-div {
+	position: relative;
+	float: right;
+	width: 200px;
+}
+
+#login-div input {
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
+
+#login-div input[type='submit'] {
+	margin-top: 10px;
+}
+
+#login-div a {
+	float: right;
+	margin-top: -30px;
+	margin-right: 30px;
+}
+
+#register-form {
+	position: relative;
+}
+
+#register-form fieldset {
+	border-radius: 10px;
+}
+
+#register-form ul {
+	padding-left: 10px;
+	list-style-type: none;
+	text-align: left;
+}
+
+#register-form li input {
+	margin-top: 5px;
+	margin-bottom: 10px;
+	margin-left: 20px;
+	width: 150px;
+}
+
+/* Submit row */
+#register-form:last-child {
+	padding: 2px 4px 2px 4px;
+	text-align: center;
+	margin: auto;	
+}
+
+#register-form input:not([type="submit"]) {
+	border: 1px solid #DDDDDD;
+	border-radius: 5px;
+	padding: 3px 5px 3px 5px;
+	font-size: 15px;
+}
+
+#body-wrap {
+	width: 1000px;
+	margin: auto;
+	margin-bottom: 0px;
+}
+
+.rss-title {
+	margin-top: 10px;
+}
+
+.rss-title .link {
+	font-size: 0.8em;
+	padding-left: 20px;
+	margin-bottom: 20px;
+}
+
+.rss-item {
+	width: 100%;
+	border: 1px solid grey;
+	padding-right: 3px;
+	margin: 10px auto 10px auto;
+	background-color: #eeefe4;
+	padding-bottom: 7px;
+}
+
+.rss-item .title {
+	width: 100%;
+	background-color: #EEEEEE;
+	border-bottom: 1px solid grey;
+	padding: 5px 0 5px 3px;
+}
+
+.rss-item .title a {
+	text-decoration: none;
+}
+
+.rss-item .date {
+	font-size: 0.7em;
+	padding: 5px 0 5px 5px;
+}
