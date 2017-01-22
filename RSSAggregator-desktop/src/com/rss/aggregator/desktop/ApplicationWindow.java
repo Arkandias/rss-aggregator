@@ -422,9 +422,9 @@ public class ApplicationWindow {
 					if (response.contains(",rss["))
 						setUserSubFeed(response);
 					initialize();
-					messageInfo("User successfully connected");
+					messageInfo("User successfully connected.");
 				} else {
-					// user was not connected
+					messageInfo("User could not be connected.");
 				}
 
 			} else {

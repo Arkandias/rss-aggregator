@@ -1,18 +1,12 @@
 package com.rss.aggregator.server;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import org.omg.CORBA.RepositoryIdHelper;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 //import com.mysql.jdbc.PreparedStatement;
 
@@ -54,8 +48,11 @@ public class DatabaseManager {
 				i++;
 			}
 			stmt.close();
+			System.out.println(i);
 			if (req > 0)
 				return (i > 0 ? "KO" : "OK");
+			else if (req == 0 && i == 0)
+				return "KO";
 			else
 			{
 				ret = "OK:id=" + id;
