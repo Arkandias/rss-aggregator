@@ -89,7 +89,7 @@ public class DatabaseManager {
 		ResultSet res =  stmt.executeQuery();
 		ret = ",rss[";
 		while (res.next()) {
-			ret += "title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
+			ret += "id=" + res.getString("id") + "&title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
 		}
 		return ret;
 	}
@@ -215,18 +215,21 @@ public class DatabaseManager {
 		return false;
 	}
 
-	public String delRSS(String userId, String rssName) {
+	public String delRSS(String userId, String rssId) {
 		Connection connexion = null;
 		PreparedStatement stmt = null;
+		String ret = "";
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
 			// remove link between user and rss
 			
-//			String sqlQuery = "SELECT * from user WHERE login LIKE ? AND password LIKE ?";
-//			stmt = connexion.prepareStatement(sqlQuery);
-//			stmt.setString(1, userName);
-//			stmt.setString(2, rssName);
+			String sqlQuery = "DELETE FROM user_domain_assoc WHERE user_domain_assoc.user_id = ? AND user_domain_assoc.rss_domain_id = (SELECT id FROM rss_domain WHERE rss_domain.id = ?)";
+			stmt = connexion.prepareStatement(sqlQuery);
+			stmt.setString(1, userId);
+			stmt.setString(2, rssId);
 			int res =  stmt.executeUpdate();
+			ret = "OK:";
+			ret += getLinkedRss(userId, connexion);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -238,6 +241,6 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return "OK";
+		return ret;
 	}
 }

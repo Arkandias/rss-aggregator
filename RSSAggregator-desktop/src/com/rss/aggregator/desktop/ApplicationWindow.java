@@ -15,6 +15,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -73,17 +75,17 @@ public class ApplicationWindow {
 	private User _user;
 
 	public class User {
-		public Map<String, String> _feedMap;
+		public Map<String, List> _feedMap;
 		public String account;
 		public String pwd;
 		public String id;
 
 		public User() {
-			this._feedMap = new HashMap<String, String>();
+			this._feedMap = new HashMap<String, List>();
 			this.account = new String("");
 		}
 
-		public Map<String, String> getSubFeed() {
+		public Map<String, List> getSubFeed() {
 			return this._feedMap;
 		}
 
@@ -95,12 +97,15 @@ public class ApplicationWindow {
 			this.account = acc;
 		}
 
-		public void setSubFeed(HashMap<String, String> hashMap) {
+		public void setSubFeed(HashMap<String, List> hashMap) {
 			this._feedMap = hashMap;
 		}
 
-		public void addFeed(String name, String url) {
-			this._feedMap.put(name, url);
+		public void addFeed(String name, String url, String id) {
+			List li = new List();
+			li.add(id);
+			li.add(url);
+			this._feedMap.put(name, li);
 		}
 
 		public void removeFeed(String name) {
@@ -138,10 +143,10 @@ public class ApplicationWindow {
 	 * Create the application.
 	 */
 	public ApplicationWindow() {
-		getConfig();
 		_user = new User();
-		_frame = new JFrame();
 		_list = new List();
+		getConfig();
+		_frame = new JFrame();
 		_list.setFont(new Font("Dialog", Font.BOLD, 12));
 		_list.setForeground(Color.LIGHT_GRAY);
 		_list.setBackground(Color.DARK_GRAY);
@@ -155,28 +160,15 @@ public class ApplicationWindow {
 		_host = res.getString("rssAggreg.host");
 		_port = Integer.parseInt(res.getString("rssAggreg.port"));
 		_cliCon = new ClientConnexion(_host, _port);
-		System.out.println("COUCOU");
-		Enumeration<String> tmp = res.getKeys();
-		while (tmp.hasMoreElements())
-		{
-			String x = tmp.nextElement();
-			System.out.println(x);
-		}
 		if (res.containsKey("rssAggreg.userName")) {
-			System.out.println("HEY");
 			_user.account = res.getString("rssAggreg.userName");
-			_user.pwd = res.getString("rssAggreg.pwd");
+			_user.pwd = res.getString("rssAggreg.userPwd");
 			_user.id = res.getString("rssAggreg.userId");
 			String response = _cliCon.connectUser(_user.account, _user.pwd);
 			if (response.startsWith("OK")) {
-				// user connected
-				// get users feed subscriptions and populate map with the
-				// response
 				_list.removeAll();
 				if (response.contains(",rss["))
 					setUserSubFeed(response);
-				initialize();
-				messageInfo("User successfully connected");
 			}
 		}
 	}
@@ -198,7 +190,7 @@ public class ApplicationWindow {
 		try {
 			SyndFeed feeds = null;
 			if (!_user.account.isEmpty())
-				feeds = rssParser.getRSSContent(_user.getSubFeed().get(_list.getSelectedItem()));
+				feeds = rssParser.getRSSContent(_user.getSubFeed().get(_list.getSelectedItem()).getItem(1));
 
 			_pane.setText("");
 			if (feeds != null) {
@@ -226,7 +218,7 @@ public class ApplicationWindow {
 		 */
 		_list.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				String feedUrl = _user.getSubFeed().get(_list.getSelectedItem());
+				String feedUrl = _user.getSubFeed().get(_list.getSelectedItem()).getItem(1);
 				populatePane(feedUrl);
 			}
 		});
@@ -279,7 +271,13 @@ public class ApplicationWindow {
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		_scrollPane = new JScrollPane(_pane);
 		_frame.getContentPane().add(_scrollPane, BorderLayout.CENTER);
-		_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		_frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent evt) {
+				_cliCon.closeCon("CLOSE");
+				System.exit(0);
+			}
+		});
+		_frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		_frame.setVisible(true);
 	}
@@ -305,6 +303,7 @@ public class ApplicationWindow {
 		menuItem.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				_cliCon.closeCon("CLOSE");
 				System.exit(0);
 			}
 		});
@@ -371,8 +370,7 @@ public class ApplicationWindow {
 					// set user id with the response
 					_user.id = response
 							.substring(response.indexOf(":"),
-									response.indexOf(",") == -1 ? response.length() : response.indexOf(","))
-							.split("=")[1];
+									response.indexOf(",") == -1 ? response.length() : response.indexOf(",")).split("=")[1];
 					ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
 					File inputFile = new File("src/rssAggregator/properties/config.properties");
 					File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
@@ -459,11 +457,15 @@ public class ApplicationWindow {
 	}
 
 	private void setUserSubFeed(String response) {
+		_user._feedMap.clear();
 		response = response.substring(response.lastIndexOf("["));
 		String[] feeds = response.split(";");
 		for (String feed : feeds) {
 			String[] feedPart = feed.split("&");
-			_user._feedMap.put(feedPart[0].split("=")[1], feedPart[1].split("=")[1]);
+			List li = new List();
+			li.add(feedPart[0].split("=")[1]);
+			li.add(feedPart[2].split("=")[1]);
+			_user._feedMap.put(feedPart[1].split("=")[1], li);
 		}
 	}
 
@@ -494,7 +496,6 @@ public class ApplicationWindow {
 			} else {
 				// user was not create
 			}
-			// _user.setAccount(name.getText());
 			_list.removeAll();
 			initialize();
 		} else if (result == JOptionPane.OK_OPTION && !(Arrays.equals(pwd.getPassword(), pwdConfirm.getPassword()))) {
@@ -531,11 +532,15 @@ public class ApplicationWindow {
 				int result = (int) JOptionPane.showConfirmDialog(null, panel, "Ajouter un flux RSS",
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (result == JOptionPane.OK_OPTION) {
-					_user.addFeed(name.getText(), url.getText());
-					_list.add(name.getText());
+//					_user.addFeed(name.getText(), url.getText());
+//					_list.add(name.getText());
 					// send to DB
 					System.err.println("userId : " + _user.id);
-					_cliCon.addRSS(_user.id, name.getText(), url.getText());
+					String response = _cliCon.addRSS(_user.id, name.getText(), url.getText());
+					_list.removeAll();
+					if (response.contains(",rss["))
+						setUserSubFeed(response);
+					initialize();
 				} else {
 					System.out.println("add sub Cancelled");
 				}
@@ -556,12 +561,17 @@ public class ApplicationWindow {
 				int result = (int) JOptionPane.showConfirmDialog(null, panel, "Supprimer un flux RSS",
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (result == JOptionPane.OK_OPTION) {
-					_user.removeFeed(_list.getSelectedItem());
 					// send to DB
-					_cliCon.delRSS(_user.id, _list.getSelectedItem());
-					_list.remove(_list.getSelectedItem());
-					_list.select(0);
-					populatePane(_list.getSelectedItem());
+					String response = _cliCon.delRSS(_user.id, _user._feedMap.get(_list.getSelectedItem()).getItem(0));
+					_list.removeAll();
+					if (response.contains(",rss["))
+						setUserSubFeed(response);
+					initialize();
+					
+//					_user.removeFeed(_list.getSelectedItem());
+//					_list.remove(_list.getSelectedItem());
+//					_list.select(0);
+//					populatePane(_list.getSelectedItem());
 				} else {
 					System.out.println("delete sub Cancelled");
 				}

@@ -58,6 +58,11 @@ public class ClientProcessor implements Runnable {
 					toSend = addRSS(response.substring(7));
 				else if (response.startsWith("delRSS"))
 					toSend = deleteRSS(response.substring(7));
+				else if (response.startsWith("CLOSE"))
+				{
+					closeConnexion = true;
+					toSend = "OK";
+				}
 
 				System.err.println("\nTo send : " + toSend);
 				writer.write(toSend);
@@ -85,7 +90,6 @@ public class ClientProcessor implements Runnable {
 		String userPwd = divInfos[1].split("=")[1];
 		System.err.println("User to create :  " + userName + " --- " + userPwd);
 		return "userCreation:" + _dbMan.addUser(userName, userPwd);
-		// check if user don't exists yet and create it if not
 	}
 
 	private String connectUser(String userInfos) {
@@ -94,7 +98,6 @@ public class ClientProcessor implements Runnable {
 		String userPwd = divInfos[1].split("=")[1];
 		System.err.println("User to login :  " + userName + " --- " + userPwd);
 		return _dbMan.checkUser(userName, userPwd, 0);
-		// get user in DB and send rss
 	}
 
 	private String addRSS(String infos) {
@@ -103,9 +106,6 @@ public class ClientProcessor implements Runnable {
 		String rssName = divInfos[1].split("=")[1];
 		String rssUrl = divInfos[2].split("=")[1];
 		System.err.println("User add rss :  " + userId + " =>" + rssName + " -- " + rssUrl);
-		// check if rss is valid
-		// if it is add it to the user
-		// otherwise send notification to user
 		return checkRss(rssUrl) ? addRSSToDB(userId, rssName, rssUrl) : "KO:Cannot add the rss, the URL is not valid";
 	}
 
