@@ -1,18 +1,12 @@
 package com.rss.aggregator.server;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import org.omg.CORBA.RepositoryIdHelper;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 //import com.mysql.jdbc.PreparedStatement;
 
@@ -54,8 +48,11 @@ public class DatabaseManager {
 				i++;
 			}
 			stmt.close();
+			System.out.println(i);
 			if (req > 0)
 				return (i > 0 ? "KO" : "OK");
+			else if (req == 0 && i == 0)
+				return "KO";
 			else
 			{
 				ret = "OK:id=" + id;
@@ -89,33 +86,8 @@ public class DatabaseManager {
 		ResultSet res =  stmt.executeQuery();
 		ret = ",rss[";
 		while (res.next()) {
-			ret += "title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
-//			rss.put(res.getString("link"), res.getString("title"));
+			ret += "id=" + res.getString("id") + "&title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
 		}
-
-	/*	
-		while (res.next())
-		{
-			rssIds.add(res.getString("id"));
-			System.out.println("rssId = " + res.getString("id"));
-		}
-		stmt.close();
-		// retrieve rss
-		Map<String, String> rss = new HashMap<String, String>();
-		// get rss linked
-//		int a;
-		System.out.println("Id list size = " + rssIds.size());
-		for (int a = 0; a < rssIds.size(); a++) {
-			sqlQuery += a == 0 ? " SELECT * from rss_domain WHERE " : "";
-			sqlQuery += (a > 0 ? " AND " : "");
-			sqlQuery += "id Like ?";
-		}
-		stmt = connexion.prepareStatement(sqlQuery);
-		for (int j = 0; j < rssIds.size(); j++) {
-			stmt.setString(j + 1, rssIds.get(j));
-		}
-		res =  stmt.executeQuery();
-		*/
 		return ret;
 	}
 
@@ -126,7 +98,6 @@ public class DatabaseManager {
 		PreparedStatement stmt = null;
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
-//		 	+ "VALUES ('" + paramEmail + "', MD5('" + paramMotDePasse + "'), '" + paramNom + "', NOW());" );
 			String sqlQuery = "INSERT INTO user (login, password) VALUES (?, ?)";
 			stmt = connexion.prepareStatement(sqlQuery);
 			stmt.setString(1, userName);
@@ -241,18 +212,21 @@ public class DatabaseManager {
 		return false;
 	}
 
-	public String delRSS(String userId, String rssName) {
+	public String delRSS(String userId, String rssId) {
 		Connection connexion = null;
 		PreparedStatement stmt = null;
+		String ret = "";
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
 			// remove link between user and rss
 			
-//			String sqlQuery = "SELECT * from user WHERE login LIKE ? AND password LIKE ?";
-//			stmt = connexion.prepareStatement(sqlQuery);
-//			stmt.setString(1, userName);
-//			stmt.setString(2, rssName);
+			String sqlQuery = "DELETE FROM user_domain_assoc WHERE user_domain_assoc.user_id = ? AND user_domain_assoc.rss_domain_id = (SELECT id FROM rss_domain WHERE rss_domain.id = ?)";
+			stmt = connexion.prepareStatement(sqlQuery);
+			stmt.setString(1, userId);
+			stmt.setString(2, rssId);
 			int res =  stmt.executeUpdate();
+			ret = "OK:";
+			ret += getLinkedRss(userId, connexion);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -264,6 +238,6 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return "OK";
+		return ret;
 	}
 }
