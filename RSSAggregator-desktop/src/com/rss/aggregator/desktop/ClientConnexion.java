@@ -58,6 +58,22 @@ public class ClientConnexion implements Runnable {
 		return "KO";
 	}
 
+	public String connectUser(String userName, String userPwd) {
+		try {
+			writer = new PrintWriter(_connexion.getOutputStream(), true);
+			reader = new BufferedInputStream(_connexion.getInputStream());
+			writer.write("connect?user=" + userName + "&pwd=" + userPwd);
+			writer.flush();
+			String response = read();
+			System.out.println("\t * " + name + " : Réponse reçue " + response);
+			return response;
+			// send the response
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		return "KO";
+	}
+
 	public String createUser(String userName, char[] userPwd) {
 		try {
 			writer = new PrintWriter(_connexion.getOutputStream(), true);

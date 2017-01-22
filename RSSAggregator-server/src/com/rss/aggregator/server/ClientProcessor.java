@@ -37,7 +37,7 @@ public class ClientProcessor implements Runnable {
 				reader = new BufferedInputStream(sock.getInputStream());
 				// On attend la demande du client
 				String response = read();
-				/*
+/*
 				InetSocketAddress remote = (InetSocketAddress) sock.getRemoteSocketAddress();
 
 				String debug = "";

@@ -90,32 +90,7 @@ public class DatabaseManager {
 		ret = ",rss[";
 		while (res.next()) {
 			ret += "title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
-//			rss.put(res.getString("link"), res.getString("title"));
 		}
-
-	/*	
-		while (res.next())
-		{
-			rssIds.add(res.getString("id"));
-			System.out.println("rssId = " + res.getString("id"));
-		}
-		stmt.close();
-		// retrieve rss
-		Map<String, String> rss = new HashMap<String, String>();
-		// get rss linked
-//		int a;
-		System.out.println("Id list size = " + rssIds.size());
-		for (int a = 0; a < rssIds.size(); a++) {
-			sqlQuery += a == 0 ? " SELECT * from rss_domain WHERE " : "";
-			sqlQuery += (a > 0 ? " AND " : "");
-			sqlQuery += "id Like ?";
-		}
-		stmt = connexion.prepareStatement(sqlQuery);
-		for (int j = 0; j < rssIds.size(); j++) {
-			stmt.setString(j + 1, rssIds.get(j));
-		}
-		res =  stmt.executeQuery();
-		*/
 		return ret;
 	}
 
@@ -126,7 +101,6 @@ public class DatabaseManager {
 		PreparedStatement stmt = null;
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
-//		 	+ "VALUES ('" + paramEmail + "', MD5('" + paramMotDePasse + "'), '" + paramNom + "', NOW());" );
 			String sqlQuery = "INSERT INTO user (login, password) VALUES (?, ?)";
 			stmt = connexion.prepareStatement(sqlQuery);
 			stmt.setString(1, userName);
