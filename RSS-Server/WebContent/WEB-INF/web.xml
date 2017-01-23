@@ -9,4 +9,65 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  
+   
+   <servlet>
+      <servlet-name>RSSServerServlet</servlet-name>
+      <servlet-class>com.rss.server.RSSServerServlet</servlet-class>
+   </servlet>
+
+<!--  	connect servlet -->
+   <servlet>
+      <servlet-name>ConnectUserServlet</servlet-name>
+      <servlet-class>com.rss.server.ConnectUserServlet</servlet-class>
+   </servlet>
+
+<!--  	create servlet -->
+   <servlet>
+      <servlet-name>CreateUserServlet</servlet-name>
+      <servlet-class>com.rss.server.ConnectUserServlet</servlet-class>
+   </servlet>
+
+<!--  add rss servlet -->
+   <servlet>
+      <servlet-name>AddRSSServlet</servlet-name>
+      <servlet-class>com.rss.server.ConnectUserServlet</servlet-class>
+   </servlet>
+
+<!--  del rss servlet -->
+   <servlet>
+      <servlet-name>DelRSSServlet</servlet-name>
+      <servlet-class>com.rss.server.ConnectUserServlet</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+      <servlet-name>RSSServerServlet</servlet-name>
+      <url-pattern>/api</url-pattern>
+   </servlet-mapping>
+ 
+<!--  	connect servlet -->
+	<servlet-mapping>
+      <servlet-name>ConnectUserServlet</servlet-name>
+      <url-pattern>/api/connect</url-pattern>
+   </servlet-mapping>
+
+<!--  	create servlet -->
+	<servlet-mapping>
+      <servlet-name>CreateUserServlet</servlet-name>
+      <url-pattern>/api/create</url-pattern>
+   </servlet-mapping>
+
+<!--  add rss servlet -->
+	<servlet-mapping>
+      <servlet-name>AddRSSServlet</servlet-name>
+      <url-pattern>/api/addRSS</url-pattern>
+   </servlet-mapping>
+
+<!--  del rss servlet -->
+	<servlet-mapping>
+      <servlet-name>DelRSSServlet</servlet-name>
+      <url-pattern>/api/delRSS</url-pattern>
+   </servlet-mapping>
+
 </web-app>
+
