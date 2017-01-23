@@ -25,19 +25,19 @@
 <!--  	create servlet -->
    <servlet>
       <servlet-name>CreateUserServlet</servlet-name>
-      <servlet-class>com.rss.server.ConnectUserServlet</servlet-class>
+      <servlet-class>com.rss.server.CreateUserServlet</servlet-class>
    </servlet>
 
 <!--  add rss servlet -->
    <servlet>
-      <servlet-name>AddRSSServlet</servlet-name>
-      <servlet-class>com.rss.server.ConnectUserServlet</servlet-class>
+      <servlet-name>AddRssServlet</servlet-name>
+      <servlet-class>com.rss.server.AddRssServlet</servlet-class>
    </servlet>
 
 <!--  del rss servlet -->
    <servlet>
-      <servlet-name>DelRSSServlet</servlet-name>
-      <servlet-class>com.rss.server.ConnectUserServlet</servlet-class>
+      <servlet-name>DelRssServlet</servlet-name>
+      <servlet-class>com.rss.server.DelRssServlet</servlet-class>
    </servlet>
 
    <servlet-mapping>
@@ -59,13 +59,13 @@
 
 <!--  add rss servlet -->
 	<servlet-mapping>
-      <servlet-name>AddRSSServlet</servlet-name>
+      <servlet-name>AddRssServlet</servlet-name>
       <url-pattern>/api/addRSS</url-pattern>
    </servlet-mapping>
 
 <!--  del rss servlet -->
 	<servlet-mapping>
-      <servlet-name>DelRSSServlet</servlet-name>
+      <servlet-name>DelRssServlet</servlet-name>
       <url-pattern>/api/delRSS</url-pattern>
    </servlet-mapping>
 
