@@ -40,34 +40,34 @@
       <servlet-class>com.rss.server.DelRssServlet</servlet-class>
    </servlet>
 
-   <servlet-mapping>
+<!--    <servlet-mapping>
       <servlet-name>RSSServerServlet</servlet-name>
       <url-pattern>/api</url-pattern>
    </servlet-mapping>
  
-<!--  	connect servlet -->
+ 	connect servlet
 	<servlet-mapping>
       <servlet-name>ConnectUserServlet</servlet-name>
       <url-pattern>/api/connect</url-pattern>
    </servlet-mapping>
 
-<!--  	create servlet -->
+ 	create servlet
 	<servlet-mapping>
       <servlet-name>CreateUserServlet</servlet-name>
       <url-pattern>/api/create</url-pattern>
    </servlet-mapping>
 
-<!--  add rss servlet -->
+ add rss servlet
 	<servlet-mapping>
       <servlet-name>AddRssServlet</servlet-name>
       <url-pattern>/api/addRSS</url-pattern>
    </servlet-mapping>
 
-<!--  del rss servlet -->
+ del rss servlet
 	<servlet-mapping>
       <servlet-name>DelRssServlet</servlet-name>
       <url-pattern>/api/delRSS</url-pattern>
    </servlet-mapping>
-
+ -->
 </web-app>
 
