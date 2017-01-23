@@ -48,7 +48,6 @@ public class DatabaseManager {
 				i++;
 			}
 			stmt.close();
-			System.out.println(i);
 			if (req > 0)
 				return (i > 0 ? "KO" : "OK");
 			else if (req == 0 && i == 0)

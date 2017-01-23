@@ -9,12 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/api/addRSS")
-public class AddRSSServlet extends HttpServlet {
+public class AddRssServlet extends HttpServlet {
     
  /**
-  * @see AddRSSServlet#AddRSSServlet()
+  * @see AddRssServlet#AddRSSServlet()
   */
- public AddRSSServlet() {
+ public AddRssServlet() {
      super();
      // TODO Auto-generated constructor stub
  }
