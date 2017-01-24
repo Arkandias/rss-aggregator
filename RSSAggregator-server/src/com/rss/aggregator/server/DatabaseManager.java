@@ -1,4 +1,6 @@
 package com.rss.aggregator.server;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -6,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 //import com.mysql.jdbc.PreparedStatement;
@@ -17,12 +20,25 @@ public class DatabaseManager {
 	private String _user;
 	private String _pwd;
 	private String _url;
+	
+	Properties prop = new Properties();
+	InputStream input = null;
 
-	public DatabaseManager() throws SQLException {
-		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
-		_user = res.getString("rssAggreg.user");
-		_pwd = res.getString("rssAggreg.pwd");
-		_url = res.getString("rssAggreg.url");
+
+	public DatabaseManager() throws SQLException, IOException {
+		input = getClass().getClassLoader().getResourceAsStream("config.properties");
+		prop.load(input);
+//		ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
+		
+		_user = prop.getProperty("rssAggreg.user");
+		_pwd = prop.getProperty("rssAggreg.pwd");
+		_url = prop.getProperty("rssAggreg.url");
+
+//		_user = res.getString("rssAggreg.user");
+//		_pwd = res.getString("rssAggreg.pwd");
+//		_url = res.getString("rssAggreg.url");
+//
+		DriverManager.registerDriver(new com.mysql.jdbc.Driver ());
 
 //		MysqlDataSource dataSource = new MysqlDataSource();
 //		dataSource.setUser(_user);

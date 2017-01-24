@@ -3,23 +3,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
-
-import org.omg.CORBA.RepositoryIdHelper;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
-//import com.mysql.jdbc.PreparedStatement;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-//import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+
 
 public class DatabaseManager {
 
@@ -43,7 +37,8 @@ public class DatabaseManager {
 		Connection connexion = null;
 		PreparedStatement stmt = null;
 		String id = null;
-		String ret = null;
+		JSONObject response = new JSONObject();
+		
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
 			String sqlQuery = "SELECT * from user WHERE login LIKE ? AND password LIKE ?";
@@ -60,11 +55,15 @@ public class DatabaseManager {
 			if (req > 0)
 				return (i > 0 ? "KO" : "OK");
 			else if (req == 0 && i == 0)
-				return "KO";
+			{
+				response.append("Success", "KO");
+				return response.toString();
+			}
 			else
 			{
-				ret = "OK:id=" + id;
-				ret += getLinkedRss(id, connexion);
+				response.append("Success", "OK");
+				response.append("userId", id);
+				response.put("rss", getLinkedRss(id, connexion));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -76,27 +75,28 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return ret;
+		return response.toString();
 	}
 	
-	private String getLinkedRss(String userId, Connection connexion) throws SQLException {
-		String ret = null;
+	private JSONArray getLinkedRss(String userId, Connection connexion) throws SQLException {
+		JSONArray rssArr = new JSONArray();
 		String sqlQuery = null;
 		PreparedStatement stmt = null;
 		// retrieve rssIds
-		List<String> rssIds = new ArrayList<String>();
-		// get rss linked
 		sqlQuery = "SELECT * FROM rss_domain RSS, user_domain_assoc ASSOC WHERE ASSOC.user_id = ? AND ASSOC.rss_domain_id = RSS.id";
-
+		
 //		sqlQuery = "SELECT * from user_domain_assoc WHERE user_id LIKE ?";
 		stmt = connexion.prepareStatement(sqlQuery);
 		stmt.setString(1, userId);
 		ResultSet res =  stmt.executeQuery();
-		ret = ",rss[";
 		while (res.next()) {
-			ret += "id=" + res.getString("id") + "&title=" + res.getString("title") + "&link=" + res.getString("link") + ";";
+			JSONObject rss = new JSONObject();
+			rss.put("rssId", res.getString("id"));
+			rss.put("rssName", res.getString("title"));
+			rss.put("rssLink", res.getString("link"));
+			rssArr.put(rss);
 		}
-		return ret;
+		return rssArr;
 	}
 
 	public String addUser(String userName, String userPwd) {
@@ -121,13 +121,16 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return "OK";
+		JSONObject response = new JSONObject();
+		response.put("Success", "OK");
+		return response.toString();
 	}
 	
-	public String checkRSS(String rssName, String rssURL) {
+	public JSONObject checkRSS(String rssName, String rssURL) {
 		Connection connexion = null;
 		PreparedStatement stmt = null;
 		String id = null;
+		JSONObject response = new JSONObject();
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
 			String sqlQuery = "SELECT * from rss_domain WHERE title LIKE ? AND link LIKE ?";
@@ -141,7 +144,10 @@ public class DatabaseManager {
 				i++;
 			}
 			if (i == 0)
-				return ("KO");			
+			{
+				response.put("Success", "KO");
+				return (response);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -152,19 +158,22 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return "OK:id=" + id;
+		response.put("Success", "OK");
+		response.put("rssId", id);
+		return response;
 	}
 	
 	public String addRSS(String userId, String rssName, String rssURL){
 		Connection connexion = null;
 		PreparedStatement stmt = null;
 		String rssId = null;
-		String response = null;
+//		String response= null;
 		String ret = null;
+		JSONObject response = new JSONObject();
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
 			response = checkRSS(rssName, rssURL);
-			if (response.startsWith("KO"))
+			if (response.get("Success").equals("KO"))
 			{
 				String sqlQuery = "INSERT INTO rss_domain (title, link) VALUES (?, ?)";
 				stmt = connexion.prepareStatement(sqlQuery);
@@ -175,7 +184,7 @@ public class DatabaseManager {
 				response = checkRSS(rssName, rssURL);
 			}
 			// get the id of rss if exists
-			rssId = response.substring(response.indexOf("=") + 1);
+			rssId = response.getString("rssId");
 			if (!checkIfAlreadyLinked(userId, rssId))
 			{
 				String sqlQuery = "INSERT INTO user_domain_assoc (user_id, rss_domain_id) VALUES (?, ?)";
@@ -184,8 +193,8 @@ public class DatabaseManager {
 				stmt.setString(2, rssId);
 				stmt.executeUpdate();
 			}
-			ret = "OK:";
-			ret += getLinkedRss(userId, connexion);
+			response.put("Success", "OK");
+			response.put("rss", getLinkedRss(userId, connexion));
 			// link user to rss
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -197,7 +206,7 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return ret;
+		return response.toString();
 	}
 	
 	private boolean checkIfAlreadyLinked(String userId, String rssId) {
@@ -223,7 +232,7 @@ public class DatabaseManager {
 	public String delRSS(String userId, String rssId) {
 		Connection connexion = null;
 		PreparedStatement stmt = null;
-		String ret = "";
+		JSONObject response = new JSONObject();
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
 			// remove link between user and rss
@@ -233,8 +242,8 @@ public class DatabaseManager {
 			stmt.setString(1, userId);
 			stmt.setString(2, rssId);
 			int res =  stmt.executeUpdate();
-			ret = "OK:";
-			ret += getLinkedRss(userId, connexion);
+			response.put("Success", "OK");
+			response.put("rss", getLinkedRss(userId, connexion));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -246,6 +255,6 @@ public class DatabaseManager {
 			} catch (SQLException ignore) {
 			}
 		}
-		return ret;
+		return response.toString();
 	}
 }
