@@ -54,13 +54,14 @@ public class DatabaseManager {
 				return (i > 0 ? "KO" : "OK");
 			else if (req == 0 && i == 0)
 			{
-				response.append("Success", "KO");
+				
+				response.put("Success", "KO");
 				return response.toString();
 			}
 			else
 			{
-				response.append("Success", "OK");
-				response.append("userId", id);
+				response.put("Success", "OK");
+				response.put("userId", id);
 				response.put("rss", getLinkedRss(id, connexion));
 			}
 		} catch (SQLException e) {

@@ -1,195 +1,219 @@
 package com.rss.aggregator.desktop;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
-import java.util.Random;
+
+import org.json.JSONObject;
 
 public class ClientConnexion implements Runnable {
 
-	private Socket _connexion = null;
-	private PrintWriter writer = null;
-	private BufferedInputStream reader = null;
 
 	private static int count = 0;
 	private String name = "Client-";
 	private String _command;
+	private String _host;
+	private int _port;
+	
 
 	public ClientConnexion(String host, int port){
 		name += ++count;
-		try {
-			_connexion = new Socket(host, port);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		_host = host;
+		_port = port;
 	}
 
 	public ClientConnexion(String host, int port, String userName, char[] userPwd) {
 		name += ++count;
-		try {
-			_connexion = new Socket(host, port);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		_host = host;
+		_port = port;
 		connectUser(userName, userPwd);
 	}
 
-	public String connectUser(String userName, char[] userPwd) {
+	public JSONObject connectUser(String userName, char[] userPwd) {
 		try {
-			writer = new PrintWriter(_connexion.getOutputStream(), true);
-			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("connect?user=" + userName + "&pwd="
-			+ Arrays.toString(userPwd).replace(", ", "").substring(1, Arrays.toString(userPwd).replace(", ", "").length() - 1));
-			writer.flush();
-			String response = read();
-			System.out.println("\t * " + name + " : Réponse reçue " + response);
-			return response;
+			
+			URL obj = new URL("http://" + _host + ":" + Integer.toString(_port) + "/api/api/connectUser?user=" + userName + "&pwd="
+					+ Arrays.toString(userPwd).replace(", ", "").substring(1, Arrays.toString(userPwd).replace(", ", "").length() - 1));
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			// optional default is GET
+			con.setRequestMethod("GET");
+
+			int responseCode = con.getResponseCode();
+			System.out.println("\nSending 'GET' request to URL : " + _host);
+			System.out.println("Response Code : " + responseCode);
+
+			BufferedReader in = new BufferedReader(
+			        new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			JSONObject tmp = new JSONObject(response.toString());
+			
+			//print result
+			System.out.println(response.toString());
+			return tmp;
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		JSONObject tmp = new JSONObject();
+		tmp.append("Success", "KO");
+		return tmp;
+	}
+
+	public JSONObject connectUser(String userName, String userPwd) {
+		try {
+			URL obj = new URL("http://" + _host + ":" + Integer.toString(_port) + "/api/api/connectUser?user=" + userName + "&pwd=" + userPwd);
+			System.out.println("\nSending 'GET' request to URL : " + obj.toString());
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			// optional default is GET
+			con.setRequestMethod("GET");
+
+			int responseCode = con.getResponseCode();
+			System.out.println("Response Code : " + responseCode);
+
+			BufferedReader in = new BufferedReader(
+			        new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			JSONObject tmp = new JSONObject(response.toString());
+			
+			//print result
+			System.out.println(response.toString());
+			return tmp;
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		JSONObject tmp = new JSONObject();
+		tmp.append("Success", "KO");
+		return tmp;
+	}
+
+	public JSONObject createUser(String userName, char[] userPwd) {
+		try {
+			URL obj = new URL("http://" + _host + ":" + Integer.toString(_port) + "/api/api/createUser?user=" + userName + "&pwd="
+					+ Arrays.toString(userPwd).replace(", ", "").substring(1, Arrays.toString(userPwd).replace(", ", "").length() - 1));
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			// optional default is GET
+			con.setRequestMethod("GET");
+
+			int responseCode = con.getResponseCode();
+			System.out.println("\nSending 'GET' request to URL : " + obj.toString());
+			System.out.println("Response Code : " + responseCode);
+
+			BufferedReader in = new BufferedReader(
+			        new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			JSONObject tmp = new JSONObject(response.toString());
+			
+			//print result
+			System.out.println(response.toString());
+			return tmp;
+
 			// send the response
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		return "KO";
+		JSONObject tmp = new JSONObject();
+		tmp.append("Success", "KO");
+		return tmp;
 	}
+	
 
-	public String connectUser(String userName, String userPwd) {
+	public JSONObject addRSS(String userId, String rssName, String rssURL) {
 		try {
-			writer = new PrintWriter(_connexion.getOutputStream(), true);
-			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("connect?user=" + userName + "&pwd=" + userPwd);
-			writer.flush();
-			String response = read();
-			System.out.println("\t * " + name + " : Réponse reçue " + response);
-			return response;
+			URL obj = new URL("http://" + _host + ":" + Integer.toString(_port) + "/api/api/addRSS?user=" + userId + "&rssName=" + rssName + "&rssURL=" + rssURL);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			// optional default is GET
+			con.setRequestMethod("GET");
+
+			int responseCode = con.getResponseCode();
+			System.out.println("\nSending 'GET' request to URL : " + obj.toString());
+			System.out.println("Response Code : " + responseCode);
+
+			BufferedReader in = new BufferedReader(
+			        new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			JSONObject tmp = new JSONObject(response.toString());
+			
+			//print result
+			System.out.println(response.toString());
+			return tmp;
+
 			// send the response
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		return "KO";
+		JSONObject tmp = new JSONObject();
+		tmp.append("Success", "KO");
+		return tmp;
 	}
 
-	public String createUser(String userName, char[] userPwd) {
+
+	public JSONObject delRSS(String userId, String rssId) {
 		try {
-			writer = new PrintWriter(_connexion.getOutputStream(), true);
-			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("create?user=" + userName + "&pwd="
-			+ Arrays.toString(userPwd).replace(", ", "").substring(1, Arrays.toString(userPwd).replace(", ", "").length() - 1));
-			writer.flush();
-			System.out.println("\t Wait for response !!!");
-			String response = read();
-			System.out.println("\t * " + name + " : Réponse reçue " + response);
-			return response;
+			URL obj = new URL("http://" + _host + ":" + Integer.toString(_port) + "/api/api/addRSS?user=" + userId + "&rssId=" + rssId);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			// optional default is GET
+			con.setRequestMethod("GET");
+
+			int responseCode = con.getResponseCode();
+			System.out.println("\nSending 'GET' request to URL : " + obj.toString());
+			System.out.println("Response Code : " + responseCode);
+
+			BufferedReader in = new BufferedReader(
+			        new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			JSONObject tmp = new JSONObject(response);
+			
+			//print result
+			System.out.println(response.toString());
+			return tmp;
 			
 			// send the response
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		return "KO";
+		JSONObject tmp = new JSONObject();
+		tmp.append("Success", "KO");
+		return tmp;
 	}
 	
-
-	public String addRSS(String userId, String rssName, String rssURL) {
-		try {
-			writer = new PrintWriter(_connexion.getOutputStream(), true);
-			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("addRSS?user=" + userId + "&rssName=" + rssName + "&rssUrl=" + rssURL);
-			writer.flush();
-			String response = read();
-			System.out.println("\t * " + name + " : Réponse reçue " + response);
-			return response;
-			// send the response
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		return "KO";
-	}
-
-
-	public String delRSS(String userId, String rssName) {
-		try {
-			writer = new PrintWriter(_connexion.getOutputStream(), true);
-			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("delRSS?user=" + userId + "&rssId=" + rssName);
-			writer.flush();
-			String response = read();
-			System.out.println("\t * " + name + " : Réponse reçue " + response);
-			return response;
-			
-			// send the response
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		return "KO";
-	}
-	
-	public String closeCon(String close) {
-		try {
-			writer = new PrintWriter(_connexion.getOutputStream(), true);
-			reader = new BufferedInputStream(_connexion.getInputStream());
-			writer.write("CLOSE");
-			writer.flush();
-			String response = read();
-			System.out.println("\t * " + name + " : Réponse reçue " + response);
-			return response;
-			// send the response
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		return "KO";
-	}
 	public void run() {
-		// nous n'allons faire que 10 demandes par thread...
-		for (int i = 0; i < 10; i++) {
-			try {
-				Thread.currentThread().sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			try {
-
-				writer = new PrintWriter(_connexion.getOutputStream(), true);
-				reader = new BufferedInputStream(_connexion.getInputStream());
-				// On envoie la commande au serveur
-
-//				String commande = getCommand();
-				writer.write(_command);
-				// TOUJOURS UTILISER flush() POUR ENVOYER RÉELLEMENT DES INFOS
-				// AU SERVEUR
-				writer.flush();
-
-				System.out.println("Commande " + _command + " envoyée au serveur");
-
-				// On attend la réponse
-				String response = read();
-				System.out.println("\t * " + name + " : Réponse reçue " + response);
-
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-
-			try {
-				Thread.currentThread().sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		writer.write("CLOSE");
-		writer.flush();
-		writer.close();
-	}
-
-	private String read() throws IOException {
-		String response = "";
-		int stream;
-		byte[] b = new byte[4096];
-		stream = reader.read(b);
-		response = new String(b, 0, stream);
-		return response;
 	}
 }
