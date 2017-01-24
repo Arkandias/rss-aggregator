@@ -68,8 +68,12 @@ public class DatabaseManager {
 		}
 		finally {
 			try {
-				stmt.close();
-				connexion.close();
+				if ( stmt != null) {
+					stmt.close();
+				}
+				if ( connexion != null) {
+					connexion.close();
+				}
 			} catch (SQLException ignore) {
 			}
 		}
