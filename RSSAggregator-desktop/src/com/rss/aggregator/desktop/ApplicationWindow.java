@@ -197,7 +197,7 @@ public class ApplicationWindow {
 
 			_pane.setText("");
 			if (feeds != null) {
-				for (Iterator i = feeds.getEntries().iterator(); i.hasNext();) {
+				for (Iterator<?> i = feeds.getEntries().iterator(); i.hasNext();) {
 					SyndEntry entry = (SyndEntry) i.next();
 					editorKit.insertHTML(doc, doc.getLength(),
 							"<h2><a href=\"" + entry.getLink() + "\">" + entry.getTitle() + "</a></h2>", 0, 0, null);
@@ -378,7 +378,7 @@ public class ApplicationWindow {
 					// set user id with the response
 					_user.id = response.getString("userId");
 							//response.substring(response.indexOf(":"), response.indexOf(",") == -1 ? response.length() : response.indexOf(",")).split("=")[1];
-					ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
+//					ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
 					File inputFile = new File("src/rssAggregator/properties/config.properties");
 					File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
 
