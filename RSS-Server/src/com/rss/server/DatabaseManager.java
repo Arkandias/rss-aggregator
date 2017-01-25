@@ -282,7 +282,6 @@ public class DatabaseManager {
 			response.put("Success", "OK");
 			response.put("rss", getLinkedRss(userId, connexion));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally {

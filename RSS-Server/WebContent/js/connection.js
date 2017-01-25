@@ -1,7 +1,7 @@
 $.ajax({
-	url: 'http://localhost:2345/connect',
+	url: 'api/connectUser',
 	type: 'POST',
-	data: {user:"prout", pwd:"prout"}
+	data: {user:"co", pwd:"co"}
 })
 .done(function() {
 	console.log("success");
