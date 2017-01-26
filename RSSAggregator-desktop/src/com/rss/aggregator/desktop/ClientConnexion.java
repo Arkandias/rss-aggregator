@@ -81,6 +81,12 @@ public class ClientConnexion implements Runnable {
 			System.out.println("\nSending 'GET' request to URL : " + obj.toString());
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			// optional default is GET
+			if (con == null)
+			{
+				JSONObject tmp = new JSONObject();
+				tmp.put("Success", "KO");
+				return tmp;
+			}
 			con.setRequestMethod("GET");
 
 			int responseCode = con.getResponseCode();
@@ -105,7 +111,7 @@ public class ClientConnexion implements Runnable {
 			e1.printStackTrace();
 		}
 		JSONObject tmp = new JSONObject();
-		tmp.append("Success", "KO");
+		tmp.put("Success", "KO");
 		return tmp;
 	}
 
@@ -142,7 +148,7 @@ public class ClientConnexion implements Runnable {
 			e1.printStackTrace();
 		}
 		JSONObject tmp = new JSONObject();
-		tmp.append("Success", "KO");
+		tmp.put("Success", "KO");
 		return tmp;
 	}
 	
@@ -204,7 +210,7 @@ public class ClientConnexion implements Runnable {
 			e1.printStackTrace();
 		}
 		JSONObject tmp = new JSONObject();
-		tmp.append("Success", "KO");
+		tmp.put("Success", "KO");
 		return tmp;
 	}
 
@@ -240,7 +246,7 @@ public class ClientConnexion implements Runnable {
 			e1.printStackTrace();
 		}
 		JSONObject tmp = new JSONObject();
-		tmp.append("Success", "KO");
+		tmp.put("Success", "KO");
 		return tmp;
 	}
 	

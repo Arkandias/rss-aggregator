@@ -171,6 +171,13 @@ public class ApplicationWindow {
 				if (response.has("rss"))
 					setUserSubFeed(response);				
 			}
+			else if (response.has("Success") && response.getString("Success").equals("KO"))
+			{
+				messageInfo("Could not join the server or connect the user.");
+				_user.account = "";
+				_user.pwd = "";
+				_user.id = "";
+			}
 		}
 	}
 
