@@ -40,5 +40,24 @@
       <servlet-class>com.rss.server.DelRssServlet</servlet-class>
    </servlet>
 
+	<servlet-mapping>
+	    <servlet-name>ConnectUserServlet</servlet-name>
+	    <url-pattern>/api/connectUser</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+	    <servlet-name>CreateUserServlet</servlet-name>
+	    <url-pattern>/api/createUser</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+	    <servlet-name>AddRssServlet</servlet-name>
+	    <url-pattern>/api/AddRSS</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	    <servlet-name>DelRssServlet</servlet-name>
+	    <url-pattern>/api/delRSS</url-pattern>
+	</servlet-mapping>
+
 </web-app>
 
