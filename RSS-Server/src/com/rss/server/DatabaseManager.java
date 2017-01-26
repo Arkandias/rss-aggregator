@@ -120,7 +120,7 @@ public class DatabaseManager {
 				response.put("Success", "KO");
 				return response.toString();
 			}
-			String sqlQuery = "INSERT INTO user (login, password) VALUES (?, ?)";
+			String sqlQuery = "INSERT INTO user (id, login, password) VALUES (NULL, ?, ?)";
 			stmt = connexion.prepareStatement(sqlQuery);
 			stmt.setString(1, userName);
 			stmt.setString(2, userPwd);
@@ -189,7 +189,8 @@ public class DatabaseManager {
 		Connection connexion = null;
 		PreparedStatement stmt = null;
 		String rssId = null;
-//		String response= null;
+		System.out.println("rssName : " + rssName);
+		System.out.println("rssURL : " + rssURL);
 		JSONObject response = new JSONObject();
 		try {
 			connexion = DriverManager.getConnection(_url, _user, _pwd);
@@ -198,10 +199,12 @@ public class DatabaseManager {
 				response.put("Success", "KO");
 				return response.toString();
 			}
+			if (response.has("Sucess"))
+				response.remove("Success");
 			response = checkRSS(rssName, rssURL);
 			if (response.get("Success").equals("KO"))
 			{
-				String sqlQuery = "INSERT INTO rss_domain (title, link) VALUES (?, ?)";
+				String sqlQuery = "INSERT INTO rss_domain (id, title, link) VALUES (NULL, ?, ?)";
 				stmt = connexion.prepareStatement(sqlQuery);
 				stmt.setString(1, rssName);
 				stmt.setString(2, rssURL);
@@ -213,7 +216,7 @@ public class DatabaseManager {
 			rssId = response.getString("rssId");
 			if (!checkIfAlreadyLinked(userId, rssId))
 			{
-				String sqlQuery = "INSERT INTO user_domain_assoc (user_id, rss_domain_id) VALUES (?, ?)";
+				String sqlQuery = "INSERT INTO user_domain_assoc (id, user_id, rss_domain_id) VALUES (NULL, ?, ?)";
 				stmt = connexion.prepareStatement(sqlQuery);
 				stmt.setString(1, userId);
 				stmt.setString(2, rssId);

@@ -165,7 +165,6 @@ public class ApplicationWindow {
 			
 			JSONObject response = _cliCon.connectUser(_user.account, _user.pwd);
 			System.out.println("response : " + response.toString());
-			System.out.println("response has success : " + response.has("Success"));
 			if (response.has("Success") && response.getString("Success").equals("OK"))
 			{
 				_list.removeAll();
@@ -208,6 +207,7 @@ public class ApplicationWindow {
 				}
 			}
 		} catch (Exception e) {
+			messageInfo("Unable to display feeds.");
 			((Throwable) e).printStackTrace();
 		}
 	}
@@ -559,10 +559,14 @@ public class ApplicationWindow {
 					System.err.println("userId : " + _user.id);
 					
 					JSONObject response = _cliCon.addRSS(_user.id, name.getText(), url.getText());
-					_list.removeAll();
-					if (response.has("rss"))
-						setUserSubFeed(response);
-					initialize();
+					if (response.getString("Success").equals("KO")) {
+						messageInfo("The feed could not be added");
+					} else {
+						_list.removeAll();
+						if (response.has("rss"))
+							setUserSubFeed(response);
+						initialize();
+					}
 				} else {
 					System.out.println("add sub Cancelled");
 				}
@@ -585,10 +589,14 @@ public class ApplicationWindow {
 				if (result == JOptionPane.OK_OPTION) {
 					// send to DB
 					JSONObject response = _cliCon.delRSS(_user.id, _user._feedMap.get(_list.getSelectedItem()).getItem(0));
-					_list.removeAll();
-					if (response.has("rss"))
-						setUserSubFeed(response);
-					initialize();
+					if (response.getString("Success").equals("KO")) {
+						messageInfo("The feed could not be removed");
+					} else {
+						_list.removeAll();
+						if (response.has("rss"))
+							setUserSubFeed(response);
+						initialize();
+					}
 					
 //					_user.removeFeed(_list.getSelectedItem());
 //					_list.remove(_list.getSelectedItem());

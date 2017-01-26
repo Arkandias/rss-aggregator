@@ -6,6 +6,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.jdom.*;
+import org.jdom.input.*;
+import org.jdom.filter.*;
 
 import org.json.JSONObject;
 
@@ -143,6 +149,31 @@ public class ClientConnexion implements Runnable {
 
 	public JSONObject addRSS(String userId, String rssName, String rssURL) {
 		try {
+			HttpURLConnection conTest = (HttpURLConnection) new URL(rssURL).openConnection();
+			JSONObject resp = new JSONObject();
+			if (conTest == null)
+				return resp.put("Success", "KO");
+			Map<String, List<String>> header = conTest.getHeaderFields();
+			if (!header.get("Content-Type").contains("application/xml"))
+				return resp.put("Success", "KO");
+			
+			org.jdom.Document document = null;
+			Element racine = null;
+			SAXBuilder sxb = new SAXBuilder();
+		      try
+		      {
+		         document = sxb.build(conTest.getInputStream());
+		      }
+		      catch(Exception e){
+					return resp.put("Success", "KO");
+		      }
+
+		      racine = document.getRootElement();
+		      if (!racine.getName().equals("rss")) {
+		    	  System.err.println("not start with rss");
+					return resp.put("Success", "KO");
+		      }
+			
 			URL obj = new URL("http://" + _host + ":" + Integer.toString(_port) + "/api/api/addRSS?user=" + userId + "&rssName=" + rssName + "&rssURL=" + rssURL);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			// optional default is GET
@@ -180,7 +211,7 @@ public class ClientConnexion implements Runnable {
 
 	public JSONObject delRSS(String userId, String rssId) {
 		try {
-			URL obj = new URL("http://" + _host + ":" + Integer.toString(_port) + "/api/api/addRSS?user=" + userId + "&rssId=" + rssId);
+			URL obj = new URL("http://" + _host + ":" + Integer.toString(_port) + "/api/api/delRSS?user=" + userId + "&rssId=" + rssId);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			// optional default is GET
 			con.setRequestMethod("GET");
@@ -198,8 +229,7 @@ public class ClientConnexion implements Runnable {
 				response.append(inputLine);
 			}
 			in.close();
-
-			JSONObject tmp = new JSONObject(response);
+			JSONObject tmp = new JSONObject(response.toString());
 			
 			//print result
 			System.out.println(response.toString());
