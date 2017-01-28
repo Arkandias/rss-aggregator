@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 new FetchFeedTask().execute((Void) null);
             }
         });
+        new FetchFeedTask().execute((Void) null);
     }
 
     public List<RssFeedModel> parseFeed(InputStream inputStream) throws XmlPullParserException, IOException {
@@ -190,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
                     isItem = false;
                 }
             }
-
             return items;
         } finally {
             inputStream.close();
@@ -246,9 +246,15 @@ public class MainActivity extends AppCompatActivity {
                 mRecyclerView.setHasFixedSize(true);
                 mRecyclerView.setAdapter(new RssFeedListAdapter(mFeedModelList));
             } else {
-                Toast.makeText(MainActivity.this,
-                        "Enter a valid Rss feed url",
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(findViewById(android.R.id.content)
+                        , "Retry, cannot get the RSS Feed", Snackbar.LENGTH_LONG)
+                        .setAction("CLOSE", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        })
+                        .show();
             }
         }
     }

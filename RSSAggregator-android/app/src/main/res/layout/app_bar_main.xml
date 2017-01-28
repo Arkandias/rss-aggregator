@@ -18,7 +18,9 @@
             android:id="@+id/textInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+            android:paddingRight="25px"
+            android:paddingLeft="25px"
+            android:paddingTop="4px">
             <EditText
                 android:id="@+id/rssFeedEditText"
                 android:layout_width="match_parent"
