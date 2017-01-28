@@ -31,7 +31,7 @@ public class AddRssServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		try {
 			DatabaseManager dbMan = new DatabaseManager();
-			response.getWriter().append(dbMan.addRSS(request.getParameter("user"), request.getParameter("rssName"), request.getParameter("rssUrl")));
+			response.getWriter().append(dbMan.addRSS(request.getParameter("user"), request.getParameter("rssName"), request.getParameter("rssURL")));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

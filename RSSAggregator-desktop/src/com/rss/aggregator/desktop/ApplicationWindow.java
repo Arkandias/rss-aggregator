@@ -20,19 +20,15 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -57,6 +53,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -114,9 +113,8 @@ public class ApplicationWindow {
 
 	}
 
-	private int _port;// = 2345;
+	private int _port;// = 8080;
 	private String _host;// = "127.0.0.1";
-	private Thread t;
 	private ClientConnexion _cliCon;
 
 	/**
@@ -164,11 +162,21 @@ public class ApplicationWindow {
 			_user.account = res.getString("rssAggreg.userName");
 			_user.pwd = res.getString("rssAggreg.userPwd");
 			_user.id = res.getString("rssAggreg.userId");
-			String response = _cliCon.connectUser(_user.account, _user.pwd);
-			if (response.startsWith("OK")) {
+			
+			JSONObject response = _cliCon.connectUser(_user.account, _user.pwd);
+			System.out.println("response : " + response.toString());
+			if (response.has("Success") && response.getString("Success").equals("OK"))
+			{
 				_list.removeAll();
-				if (response.contains(",rss["))
-					setUserSubFeed(response);
+				if (response.has("rss"))
+					setUserSubFeed(response);				
+			}
+			else if (response.has("Success") && response.getString("Success").equals("KO"))
+			{
+				messageInfo("Could not join the server or connect the user.");
+				_user.account = "";
+				_user.pwd = "";
+				_user.id = "";
 			}
 		}
 	}
@@ -180,7 +188,8 @@ public class ApplicationWindow {
 		setList();
 		_list.select(0);
 		setFeedZone();
-		populatePane(_list.getSelectedItem());
+		if (!_user._feedMap.isEmpty())
+			populatePane(_list.getSelectedItem());
 	}
 
 	private void populatePane(String feedUrl) {
@@ -194,7 +203,7 @@ public class ApplicationWindow {
 
 			_pane.setText("");
 			if (feeds != null) {
-				for (Iterator i = feeds.getEntries().iterator(); i.hasNext();) {
+				for (Iterator<?> i = feeds.getEntries().iterator(); i.hasNext();) {
 					SyndEntry entry = (SyndEntry) i.next();
 					editorKit.insertHTML(doc, doc.getLength(),
 							"<h2><a href=\"" + entry.getLink() + "\">" + entry.getTitle() + "</a></h2>", 0, 0, null);
@@ -205,6 +214,7 @@ public class ApplicationWindow {
 				}
 			}
 		} catch (Exception e) {
+			messageInfo("Unable to display feeds.");
 			((Throwable) e).printStackTrace();
 		}
 	}
@@ -273,7 +283,6 @@ public class ApplicationWindow {
 		_frame.getContentPane().add(_scrollPane, BorderLayout.CENTER);
 		_frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
-				_cliCon.closeCon("CLOSE");
 				System.exit(0);
 			}
 		});
@@ -303,7 +312,6 @@ public class ApplicationWindow {
 		menuItem.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				_cliCon.closeCon("CLOSE");
 				System.exit(0);
 			}
 		});
@@ -360,18 +368,24 @@ public class ApplicationWindow {
 			int result = (int) JOptionPane.showConfirmDialog(null, panel, "Veuillez entrer votre identifiant.",
 					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (result == JOptionPane.OK_OPTION) {
-				String response = _cliCon.connectUser(name.getText(), pwd.getPassword());
-				if (response.startsWith("OK")) {
+				JSONObject response = _cliCon.connectUser(name.getText(), pwd.getPassword());
+				if (response.get("Success").equals("OK"))
+				{
+					_list.removeAll();
+					if (response.has("rss"))
+						setUserSubFeed(response);				
+				}
+//				String response = _cliCon.connectUser(name.getText(), pwd.getPassword());
+				if (response.getString("Success").equals("OK")) {
 					// user connected
 					_user.setAccount(name.getText());
 					_user.pwd = Arrays.toString(pwd.getPassword()).replace(", ", "").substring(1,
 							Arrays.toString(pwd.getPassword()).replace(", ", "").length() - 1);
 					_connectionBtn.setText("Déconnection " + name.getText());
 					// set user id with the response
-					_user.id = response
-							.substring(response.indexOf(":"),
-									response.indexOf(",") == -1 ? response.length() : response.indexOf(",")).split("=")[1];
-					ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
+					_user.id = response.getString("userId");
+							//response.substring(response.indexOf(":"), response.indexOf(",") == -1 ? response.length() : response.indexOf(",")).split("=")[1];
+//					ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
 					File inputFile = new File("src/rssAggregator/properties/config.properties");
 					File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
 
@@ -419,7 +433,7 @@ public class ApplicationWindow {
 					// get users feed subscriptions and populate map with the
 					// response
 					_list.removeAll();
-					if (response.contains(",rss["))
+					if (response.has("rss"))
 						setUserSubFeed(response);
 					initialize();
 					messageInfo("User successfully connected.");
@@ -456,8 +470,19 @@ public class ApplicationWindow {
 		}
 	}
 
-	private void setUserSubFeed(String response) {
+	private void setUserSubFeed(JSONObject response) {
+		JSONArray rssArray = response.getJSONArray("rss");
 		_user._feedMap.clear();
+		for (int i = 0; i < rssArray.length(); i++)
+		{
+			JSONObject rss = rssArray.getJSONObject(i);
+			List li = new List();
+			li.add(rss.getString("rssId"));
+			li.add(rss.getString("rssLink"));
+			_user._feedMap.put(rss.getString("rssName"), li);
+		}
+		
+		/*
 		response = response.substring(response.lastIndexOf("["));
 		String[] feeds = response.split(";");
 		for (String feed : feeds) {
@@ -467,6 +492,7 @@ public class ApplicationWindow {
 			li.add(feedPart[2].split("=")[1]);
 			_user._feedMap.put(feedPart[1].split("=")[1], li);
 		}
+		*/
 	}
 
 	private void registerModal(String string, int state) {
@@ -489,12 +515,14 @@ public class ApplicationWindow {
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION && Arrays.equals(pwd.getPassword(), pwdConfirm.getPassword())) {
 			// send to DB
-			String response = _cliCon.createUser(name.getText(), pwd.getPassword());
-			if (response.startsWith("OK")) {
+			JSONObject response = _cliCon.createUser(name.getText(), pwd.getPassword());
+//			String response = _cliCon.createUser(name.getText(), pwd.getPassword());
+			if (response.getString("Success").equals("OK")) {
 				// user created
 				messageInfo("User successfully created");
 			} else {
 				// user was not create
+				messageInfo("Could nor create user");
 			}
 			_list.removeAll();
 			initialize();
@@ -536,11 +564,16 @@ public class ApplicationWindow {
 //					_list.add(name.getText());
 					// send to DB
 					System.err.println("userId : " + _user.id);
-					String response = _cliCon.addRSS(_user.id, name.getText(), url.getText());
-					_list.removeAll();
-					if (response.contains(",rss["))
-						setUserSubFeed(response);
-					initialize();
+					
+					JSONObject response = _cliCon.addRSS(_user.id, name.getText(), url.getText());
+					if (response.getString("Success").equals("KO")) {
+						messageInfo("The feed could not be added");
+					} else {
+						_list.removeAll();
+						if (response.has("rss"))
+							setUserSubFeed(response);
+						initialize();
+					}
 				} else {
 					System.out.println("add sub Cancelled");
 				}
@@ -562,11 +595,15 @@ public class ApplicationWindow {
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (result == JOptionPane.OK_OPTION) {
 					// send to DB
-					String response = _cliCon.delRSS(_user.id, _user._feedMap.get(_list.getSelectedItem()).getItem(0));
-					_list.removeAll();
-					if (response.contains(",rss["))
-						setUserSubFeed(response);
-					initialize();
+					JSONObject response = _cliCon.delRSS(_user.id, _user._feedMap.get(_list.getSelectedItem()).getItem(0));
+					if (response.getString("Success").equals("KO")) {
+						messageInfo("The feed could not be removed");
+					} else {
+						_list.removeAll();
+						if (response.has("rss"))
+							setUserSubFeed(response);
+						initialize();
+					}
 					
 //					_user.removeFeed(_list.getSelectedItem());
 //					_list.remove(_list.getSelectedItem());
