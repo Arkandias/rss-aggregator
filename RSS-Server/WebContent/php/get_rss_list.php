@@ -1,8 +1,7 @@
 <?php
 include 'DBLink.php';
 
-$login = $_POST['user'];
-$password = $_POST['pwd'];
+$login = $_POST['login'];
 
 $conn = get_connection();
 $result = mysqli_query($conn, "SELECT USER.id, ASSOC.rss_domain_id FROM user USER, user_domain_assoc ASSOC WHERE ASSOC.user_id = USER.id AND login = '{$login}'");
