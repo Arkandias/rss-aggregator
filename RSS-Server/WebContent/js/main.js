@@ -1,6 +1,40 @@
 $(function() {
 	var LOGIN_HTML = '<form><label for="login">Login:</label><input type="text" name="login" id="login-input"><label for="password">Password:</label><input type="password" name="password" id="password-input"></form><a id="login-button"><button>Login</button></a><a href="register.html" id="register-button"><button>Register</button></a>'
 
+	if ($.cookie('rss-aggregator')) {
+		var login = $.cookie('rss-aggregator');
+		$('#login-div > *').remove()
+		$('#login-div').append("<div>Welcome, " + login + ".</div><button id='logout-button'>Logout</button>");
+		$('#logout-button').click(function() {
+			$('#login-div > *').remove()
+			$('#body-wrap > *').remove();
+			$('#login-div').append(LOGIN_HTML);
+			$.removeCookie('rss-aggregator');
+		});
+		$.ajax({
+			url: 'php/get_rss_list.php',
+			type: 'POST',
+			dataType: 'json',
+			data: {login: login},
+		})
+		.done(function(msg) {
+			for (var i = msg.length - 1; i >= 0; i--) {
+				$.getFeed({
+					url: 'php/get_rss_by_id.php',
+					type: 'GET',
+					dataType: 'json',
+					data: {id: msg[i]},
+					success: function (feed) {
+						addRSSFeed(feed, msg[i]);
+					}
+				})
+			}
+		})
+		.fail(function() {
+			console.log("error");
+		})		
+	}
+
 	$('#search-button').click(function() {
 		$.getFeed({
 			url: "php/get_rss.php",
@@ -35,6 +69,7 @@ $(function() {
 				$('#login-div > *').remove()
 				$('#body-wrap > *').remove();
 				$('#login-div').append(LOGIN_HTML);
+				$.removeCookie('rss-aggregator');
 			});
 			for (var i = msg.length - 1; i >= 0; i--) {
 				$.getFeed({
