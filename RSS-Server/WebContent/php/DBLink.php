@@ -7,6 +7,5 @@ function get_connection()
 		"",
 		"rssaggregatordb"
 	);
-	echo json_encode($conn);
 	return $conn;
 }

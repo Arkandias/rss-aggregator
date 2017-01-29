@@ -5,7 +5,8 @@
 	<link href='//fonts.googleapis.com/css?family=Black Ops One' rel='stylesheet'>
 	<link rel="stylesheet" type="text/css" href="styles/style.css">
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-	<script type="text/javascript" src="lib/jquery.jfeed.js"></script>
+	<script type="text/javascript" src="lib/jfeed.js"></script>
+	<script type="text/javascript" src="lib/jquery.cookie.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>
 </head>
 <body>
@@ -14,13 +15,12 @@
 		<div id="login-div">
 			<form>
 				<label for="login">Login:</label>
-				<input type="text" name="login">
+				<input type="text" name="login" id="login-input">
 				<label for="password">Password:</label>
-				<input type="password" name="password">
+				<input type="password" name="password" id="password-input">
 			</form>
 			<a id="login-button"><button>Login</button></a>
 			<a href="register.html" id="register-button"><button>Register</button></a>
-			<br>
 		</div>
 	<div id="body-wrap">
 	</div>
