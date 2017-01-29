@@ -1,0 +1,63 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building rssAggregatorServer Maven Webapp 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+Downloading: https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/5.1.6/mysql-connector-java-5.1.6.pom
+2/2 KB            Downloaded: https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/5.1.6/mysql-connector-java-5.1.6.pom (2 KB at 1.6 KB/sec)
+Downloading: https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/5.1.6/mysql-connector-java-5.1.6.jar
+3/687 KB   5/687 KB   8/687 KB   11/687 KB   13/687 KB   16/687 KB   19/687 KB   21/687 KB   24/687 KB   27/687 KB   29/687 KB   32/687 KB   36/687 KB   40/687 KB   44/687 KB   48/687 KB   52/687 KB   56/687 KB   60/687 KB   64/687 KB   68/687 KB   72/687 KB   76/687 KB   80/687 KB   84/687 KB   88/687 KB   92/687 KB   96/687 KB   100/687 KB   104/687 KB   108/687 KB   112/687 KB   116/687 KB   120/687 KB   124/687 KB   128/687 KB   132/687 KB   136/687 KB   140/687 KB   144/687 KB   148/687 KB   152/687 KB   156/687 KB   160/687 KB   164/687 KB   168/687 KB   172/687 KB   176/687 KB   180/687 KB   184/687 KB   188/687 KB   192/687 KB   196/687 KB   200/687 KB   204/687 KB   208/687 KB   212/687 KB   216/687 KB   220/687 KB   224/687 KB   228/687 KB   232/687 KB   236/687 KB   240/687 KB   244/687 KB   248/687 KB   252/687 KB   256/687 KB   260/687 KB   264/687 KB   268/687 KB   272/687 KB   276/687 KB   280/687 KB   284/687 KB   288/687 KB   292/687 KB   296/687 KB   300/687 KB   304/687 KB   308/687 KB   312/687 KB   316/687 KB   320/687 KB   324/687 KB   328/687 KB   332/687 KB   336/687 KB   340/687 KB   344/687 KB   348/687 KB   352/687 KB   356/687 KB   360/687 KB   364/687 KB   368/687 KB   372/687 KB   376/687 KB   380/687 KB   384/687 KB   388/687 KB   392/687 KB   396/687 KB   400/687 KB   404/687 KB   408/687 KB   412/687 KB   416/687 KB   420/687 KB   424/687 KB   428/687 KB   432/687 KB   436/687 KB   440/687 KB   444/687 KB   448/687 KB   452/687 KB   456/687 KB   460/687 KB   464/687 KB   468/687 KB   472/687 KB   476/687 KB   480/687 KB   484/687 KB   488/687 KB   492/687 KB   496/687 KB   500/687 KB   504/687 KB   508/687 KB   512/687 KB   516/687 KB   520/687 KB   524/687 KB   528/687 KB   532/687 KB   536/687 KB   540/687 KB   544/687 KB   548/687 KB   552/687 KB   556/687 KB   560/687 KB   564/687 KB   568/687 KB   572/687 KB   576/687 KB   580/687 KB   584/687 KB   588/687 KB   592/687 KB   596/687 KB   600/687 KB   604/687 KB   608/687 KB   612/687 KB   616/687 KB   620/687 KB   624/687 KB   628/687 KB   632/687 KB   636/687 KB   640/687 KB   644/687 KB   648/687 KB   652/687 KB   656/687 KB   660/687 KB   664/687 KB   668/687 KB   672/687 KB   676/687 KB   680/687 KB   684/687 KB   687/687 KB                Downloaded: https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/5.1.6/mysql-connector-java-5.1.6.jar (687 KB at 845.8 KB/sec)
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ rssAggregatorServer ---
+[INFO] Deleting E:\tmp\rss-aggregator\RSS-Server\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ rssAggregatorServer ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory E:\tmp\rss-aggregator\RSS-Server\src\main\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ rssAggregatorServer ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 8 source files to E:\tmp\rss-aggregator\RSS-Server\target\classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ rssAggregatorServer ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory E:\tmp\rss-aggregator\RSS-Server\src\test\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ rssAggregatorServer ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ rssAggregatorServer ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ rssAggregatorServer ---
+[INFO] Building jar: E:\tmp\rss-aggregator\RSS-Server\target\rssAggregatorServer.jar
+[INFO] 
+[INFO] --- appassembler-maven-plugin:1.1.1:assemble (default) @ rssAggregatorServer ---
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\json\json\20160810\json-20160810.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\json\json\20160810\json-20160810.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\mysql\mysql-connector-java\5.1.6\mysql-connector-java-5.1.6.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\mysql\mysql-connector-java\5.1.6\mysql-connector-java-5.1.6.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\8.0.28\tomcat-embed-core-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\embed\tomcat-embed-core\8.0.28\tomcat-embed-core-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\embed\tomcat-embed-logging-juli\8.0.28\tomcat-embed-logging-juli-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\embed\tomcat-embed-logging-juli\8.0.28\tomcat-embed-logging-juli-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\embed\tomcat-embed-jasper\8.0.28\tomcat-embed-jasper-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\embed\tomcat-embed-jasper\8.0.28\tomcat-embed-jasper-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\8.0.28\tomcat-embed-el-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\embed\tomcat-embed-el\8.0.28\tomcat-embed-el-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\eclipse\jdt\core\compiler\ecj\4.4.2\ecj-4.4.2.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\eclipse\jdt\core\compiler\ecj\4.4.2\ecj-4.4.2.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-jasper\8.0.28\tomcat-jasper-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-jasper\8.0.28\tomcat-jasper-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-servlet-api\8.0.28\tomcat-servlet-api-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-servlet-api\8.0.28\tomcat-servlet-api-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-juli\8.0.28\tomcat-juli-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-juli\8.0.28\tomcat-juli-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-el-api\8.0.28\tomcat-el-api-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-el-api\8.0.28\tomcat-el-api-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-api\8.0.28\tomcat-api-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-api\8.0.28\tomcat-api-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-util-scan\8.0.28\tomcat-util-scan-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-util-scan\8.0.28\tomcat-util-scan-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-util\8.0.28\tomcat-util-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-util\8.0.28\tomcat-util-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-jasper-el\8.0.28\tomcat-jasper-el-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-jasper-el\8.0.28\tomcat-jasper-el-8.0.28.jar
+[INFO] Installing C:\Users\Arkayl\.m2\repository\org\apache\tomcat\tomcat-jsp-api\8.0.28\tomcat-jsp-api-8.0.28.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\org\apache\tomcat\tomcat-jsp-api\8.0.28\tomcat-jsp-api-8.0.28.jar
+[INFO] Installing E:\tmp\rss-aggregator\RSS-Server\target\rssAggregatorServer.jar to E:\tmp\rss-aggregator\RSS-Server\target\repo\com\rss\server\rssAggregatorServer\1.0-SNAPSHOT\rssAggregatorServer-1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ rssAggregatorServer ---
+[INFO] Installing E:\tmp\rss-aggregator\RSS-Server\target\rssAggregatorServer.jar to C:\Users\Arkayl\.m2\repository\com\rss\server\rssAggregatorServer\1.0-SNAPSHOT\rssAggregatorServer-1.0-SNAPSHOT.jar
+[INFO] Installing E:\tmp\rss-aggregator\RSS-Server\pom.xml to C:\Users\Arkayl\.m2\repository\com\rss\server\rssAggregatorServer\1.0-SNAPSHOT\rssAggregatorServer-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 4.244 s
+[INFO] Finished at: 2017-01-28T16:59:03+01:00
+[INFO] Final Memory: 19M/217M
+[INFO] ------------------------------------------------------------------------

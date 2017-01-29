@@ -1,0 +1,9 @@
+docker network create my-network
+
+docker run -p 3306:3306 --net=my-network --name db -e MYSQL_ROOT_PASSWORD=toor -e MYSQL_DATABASE="rssaggregatordb" -d mysql:latest
+
+docker exec -i db mysql --password=toor < ./rssaggregatordb.sql
+
+docker build --no-cache=true -t rssaggregator .
+
+docker run -d -p 8080:8080 --net=my-network --name rssaggregator --link db:db rssaggregator
