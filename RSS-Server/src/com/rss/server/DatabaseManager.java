@@ -1,6 +1,7 @@
 package com.rss.server;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,6 +20,8 @@ public class DatabaseManager {
 	private String _pwd = "toor";
 	private String _url = "jdbc:mysql://localhost:3306/rssaggregatordb";
 
+	String _dbUrl;
+	
 	Properties prop = new Properties();
 	InputStream input = null;
 
@@ -32,6 +35,12 @@ public class DatabaseManager {
 			_pwd = prop.getProperty("rssAggreg.pwd");
 			_url = prop.getProperty("rssAggreg.url");
 		}
+	    _dbUrl = System.getenv("JDBC_DATABASE_URL");
+	}
+
+	private static Connection getConnection() throws URISyntaxException, SQLException {
+	    String dbUrl = System.getenv("JDBC_DATABASE_URL");
+	    return DriverManager.getConnection(dbUrl);
 	}
 	
 	public String checkUser(String userName, String userPwd, int req) {

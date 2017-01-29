@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -127,6 +128,7 @@ public class ApplicationWindow {
 			public void run() {
 				try {
 					ApplicationWindow window = new ApplicationWindow();
+					window._frame.setMinimumSize(new Dimension(600, 600));
 					window._frame.setIconImage(
 							ImageIO.read(getClass().getResource("/resources/rss.png")).getScaledInstance(25, 25, 3));
 					window._frame.setVisible(true);
@@ -247,6 +249,8 @@ public class ApplicationWindow {
 					popMenu = new JPopupMenu();
 					drawSubMenu(popMenu);
 					popMenu.show(arg0.getComponent(), arg0.getX(), arg0.getY());
+					if (_user.id.isEmpty() || _user.account.isEmpty())
+						popMenu.setEnabled(false);
 					_frame.revalidate();
 				}
 			}
@@ -320,9 +324,9 @@ public class ApplicationWindow {
 
 		horizontalGlue = Box.createHorizontalGlue();
 		if (_user.account.isEmpty())
-			_connectionBtn = new JButton("Connection");
+			_connectionBtn = new JButton("Log in");
 		else
-			_connectionBtn = new JButton("Déconnection " + _user.account);
+			_connectionBtn = new JButton("Log out " + _user.account);
 		try {
 			Image img = ImageIO.read(getClass().getResource("/resources/user-login.png"));
 			_connectionBtn.setIcon(new ImageIcon(img.getScaledInstance(25, 25, 3)));
@@ -335,7 +339,7 @@ public class ApplicationWindow {
 				_connectModal();
 			}
 		});
-		_registerBtn = new JButton("Cr\u00E9er un compte");
+		_registerBtn = new JButton("Create account");
 		try {
 			Image img = ImageIO.read(getClass().getResource("/resources/user-add.png"));
 			_registerBtn.setIcon(new ImageIcon(img.getScaledInstance(25, 25, 3)));
@@ -361,11 +365,11 @@ public class ApplicationWindow {
 			JTextField name = new JTextField();
 			JPasswordField pwd = new JPasswordField();
 			JPanel panel = new JPanel(new GridLayout(0, 1));
-			panel.add(new JLabel("Identifiant :"));
+			panel.add(new JLabel("Login :"));
 			panel.add(name);
-			panel.add(new JLabel("Mot de passe :"));
+			panel.add(new JLabel("password :"));
 			panel.add(pwd);
-			int result = (int) JOptionPane.showConfirmDialog(null, panel, "Veuillez entrer votre identifiant.",
+			int result = (int) JOptionPane.showConfirmDialog(null, panel, "Enter your credentials.",
 					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (result == JOptionPane.OK_OPTION) {
 				JSONObject response = _cliCon.connectUser(name.getText(), pwd.getPassword());
@@ -375,7 +379,6 @@ public class ApplicationWindow {
 					if (response.has("rss"))
 						setUserSubFeed(response);				
 				}
-//				String response = _cliCon.connectUser(name.getText(), pwd.getPassword());
 				if (response.getString("Success").equals("OK")) {
 					// user connected
 					_user.setAccount(name.getText());
@@ -384,8 +387,6 @@ public class ApplicationWindow {
 					_connectionBtn.setText("Déconnection " + name.getText());
 					// set user id with the response
 					_user.id = response.getString("userId");
-							//response.substring(response.indexOf(":"), response.indexOf(",") == -1 ? response.length() : response.indexOf(",")).split("=")[1];
-//					ResourceBundle res = ResourceBundle.getBundle("rssAggregator.properties.config");
 					File inputFile = new File("src/rssAggregator/properties/config.properties");
 					File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
 
@@ -447,12 +448,12 @@ public class ApplicationWindow {
 		} else {
 			JPanel panel = new JPanel(new GridLayout(0, 1));
 			int result = (int) JOptionPane.showConfirmDialog(null, panel,
-					"Voulez vous déconnecter l'utilisateur : " + _user.getAccount() + " ?",
+					"Disconnect user: " + _user.getAccount() + " ?",
 					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 			if (result == JOptionPane.OK_OPTION) {
 				_user.setAccount("");
 				// send to DB
-				_connectionBtn.setText("Connection");
+				_connectionBtn.setText("Log in");
 				// reset feed zone
 				_pane.removeAll();
 				try {
@@ -465,7 +466,7 @@ public class ApplicationWindow {
 				_list.removeAll();
 				_frame.revalidate();
 			} else {
-				System.out.println("deconnexion Cancelled");
+				System.out.println("log out Cancelled");
 			}
 		}
 	}
@@ -481,18 +482,6 @@ public class ApplicationWindow {
 			li.add(rss.getString("rssLink"));
 			_user._feedMap.put(rss.getString("rssName"), li);
 		}
-		
-		/*
-		response = response.substring(response.lastIndexOf("["));
-		String[] feeds = response.split(";");
-		for (String feed : feeds) {
-			String[] feedPart = feed.split("&");
-			List li = new List();
-			li.add(feedPart[0].split("=")[1]);
-			li.add(feedPart[2].split("=")[1]);
-			_user._feedMap.put(feedPart[1].split("=")[1], li);
-		}
-		*/
 	}
 
 	private void registerModal(String string, int state) {
@@ -501,22 +490,21 @@ public class ApplicationWindow {
 		JPasswordField pwdConfirm = new JPasswordField();
 		JPanel panel = new JPanel(new GridLayout(0, 1));
 		if (state != 0) {
-			JLabel error = new JLabel("Le mot de passe et la confirmation ne correspondent pas.");
+			JLabel error = new JLabel("password and confirmation does not match.");
 			error.setForeground(Color.red);
 			panel.add(error);
 		}
-		panel.add(new JLabel("Identifiant :"));
+		panel.add(new JLabel("Login :"));
 		panel.add(name);
-		panel.add(new JLabel("Mot de passe :"));
+		panel.add(new JLabel("Password :"));
 		panel.add(pwd);
-		panel.add(new JLabel("Confirmer le mot de passe :"));
+		panel.add(new JLabel("Confirm your password :"));
 		panel.add(pwdConfirm);
-		int result = (int) JOptionPane.showConfirmDialog(null, panel, "Veuillez entrer votre identifiant.",
+		int result = (int) JOptionPane.showConfirmDialog(null, panel, "Enter your credentials.",
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION && Arrays.equals(pwd.getPassword(), pwdConfirm.getPassword())) {
 			// send to DB
 			JSONObject response = _cliCon.createUser(name.getText(), pwd.getPassword());
-//			String response = _cliCon.createUser(name.getText(), pwd.getPassword());
 			if (response.getString("Success").equals("OK")) {
 				// user created
 				messageInfo("User successfully created");
@@ -557,11 +545,9 @@ public class ApplicationWindow {
 				panel.add(name);
 				panel.add(new JLabel("URL :"));
 				panel.add(url);
-				int result = (int) JOptionPane.showConfirmDialog(null, panel, "Ajouter un flux RSS",
+				int result = (int) JOptionPane.showConfirmDialog(null, panel, "Add an RSS",
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (result == JOptionPane.OK_OPTION) {
-//					_user.addFeed(name.getText(), url.getText());
-//					_list.add(name.getText());
 					// send to DB
 					System.err.println("userId : " + _user.id);
 					
@@ -579,7 +565,7 @@ public class ApplicationWindow {
 				}
 			}
 		});
-		JMenuItem delSub = new JMenuItem("Supprimer");
+		JMenuItem delSub = new JMenuItem("Remove a subscription");
 		try {
 			Image img = ImageIO.read(getClass().getResource("/resources/rss-remove.png"));
 			delSub.setIcon(new ImageIcon(img.getScaledInstance(25, 25, 3)));
@@ -590,8 +576,8 @@ public class ApplicationWindow {
 			public void actionPerformed(ActionEvent e) {
 				_frame.revalidate();
 				JPanel panel = new JPanel(new GridLayout(0, 1));
-				panel.add(new JLabel("Voulez-vous supprimer : " + _list.getSelectedItem() + " ?"));
-				int result = (int) JOptionPane.showConfirmDialog(null, panel, "Supprimer un flux RSS",
+				panel.add(new JLabel("Remove rss: " + _list.getSelectedItem() + " ?"));
+				int result = (int) JOptionPane.showConfirmDialog(null, panel, "Remove an RSS",
 						JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (result == JOptionPane.OK_OPTION) {
 					// send to DB
@@ -604,16 +590,16 @@ public class ApplicationWindow {
 							setUserSubFeed(response);
 						initialize();
 					}
-					
-//					_user.removeFeed(_list.getSelectedItem());
-//					_list.remove(_list.getSelectedItem());
-//					_list.select(0);
-//					populatePane(_list.getSelectedItem());
 				} else {
 					System.out.println("delete sub Cancelled");
 				}
 			}
 		});
+		if (_user.id.isEmpty() || _user.account.isEmpty())
+		{
+			addSub.setEnabled(false);
+			delSub.setEnabled(false);
+		}
 		popMenu.add(addSub);
 		popMenu.add(delSub);
 	}

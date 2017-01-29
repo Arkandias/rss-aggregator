@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>RSS-Server</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+   
+   <servlet>
+      <servlet-name>RSSServerServlet</servlet-name>
+      <servlet-class>com.rss.server.RSSServerServlet</servlet-class>
+   </servlet>
+
+<!--  	connect servlet -->
+   <servlet>
+      <servlet-name>ConnectUserServlet</servlet-name>
+      <servlet-class>com.rss.server.ConnectUserServlet</servlet-class>
+   </servlet>
+
+<!--  	create servlet -->
+   <servlet>
+      <servlet-name>CreateUserServlet</servlet-name>
+      <servlet-class>com.rss.server.CreateUserServlet</servlet-class>
+   </servlet>
+
+<!--  add rss servlet -->
+   <servlet>
+      <servlet-name>AddRssServlet</servlet-name>
+      <servlet-class>com.rss.server.AddRssServlet</servlet-class>
+   </servlet>
+
+<!--  del rss servlet -->
+   <servlet>
+      <servlet-name>DelRssServlet</servlet-name>
+      <servlet-class>com.rss.server.DelRssServlet</servlet-class>
+   </servlet>
+
+	<servlet-mapping>
+	    <servlet-name>ConnectUserServlet</servlet-name>
+	    <url-pattern>/api/connectUser</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+	    <servlet-name>CreateUserServlet</servlet-name>
+	    <url-pattern>/api/createUser</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+	    <servlet-name>AddRssServlet</servlet-name>
+	    <url-pattern>/api/AddRSS</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	    <servlet-name>DelRssServlet</servlet-name>
+	    <url-pattern>/api/delRSS</url-pattern>
+	</servlet-mapping>
+
+</web-app>
+
