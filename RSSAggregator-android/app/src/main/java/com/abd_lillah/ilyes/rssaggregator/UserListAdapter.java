@@ -17,7 +17,7 @@ import java.util.List;
 public class UserListAdapter
         extends RecyclerView.Adapter<UserListAdapter.FeedModelViewHolder> {
 
-    private List<RssFeedModel> mRssFeedModels;
+    private List<ListUserModel> mRssFeedModels;
     private Context mContext;
     public static class FeedModelViewHolder extends RecyclerView.ViewHolder {
         private View rssFeedView;
@@ -29,14 +29,14 @@ public class UserListAdapter
     }
 
 
-    public UserListAdapter(List<RssFeedModel> rssFeedModels) {
+    public UserListAdapter(List<ListUserModel> rssFeedModels) {
         mRssFeedModels = rssFeedModels;
     }
 
     @Override
     public FeedModelViewHolder onCreateViewHolder(ViewGroup parent, final int type) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_rss_feed, parent, false);
+                .inflate(R.layout.list_feed, parent, false);
         FeedModelViewHolder holder = new FeedModelViewHolder(v);
         return holder;
     }
@@ -44,11 +44,10 @@ public class UserListAdapter
 
     @Override
     public void onBindViewHolder(final FeedModelViewHolder holder, final int position) {
-        final RssFeedModel rssFeedModel = mRssFeedModels.get(position);
+        final ListUserModel rssFeedModel = mRssFeedModels.get(position);
 
-        ((TextView)holder.rssFeedView.findViewById(R.id.titleText)).setText(rssFeedModel.title);
-        ((TextView)holder.rssFeedView.findViewById(R.id.descriptionText)).setText(rssFeedModel.description);
-        ((TextView)holder.rssFeedView.findViewById(R.id.linkText)).setText(rssFeedModel.link);
+        ((TextView)holder.rssFeedView.findViewById(R.id.titleFeed)).setText(rssFeedModel.link);
+        ((TextView)holder.rssFeedView.findViewById(R.id.linkFeed)).setText(rssFeedModel.title);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

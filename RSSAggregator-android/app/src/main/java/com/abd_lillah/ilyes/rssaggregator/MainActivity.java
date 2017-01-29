@@ -1,10 +1,15 @@
 package com.abd_lillah.ilyes.rssaggregator;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -12,6 +17,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -40,9 +46,12 @@ import android.widget.TextView;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,10 +68,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView mFeedDescriptionTextView;
     private Context mContext;
     private Activity mActivity;
-
+    private Intent mIntent;
+    private String mLinks;
     private RelativeLayout mRelativeLayout;
     private Button mButton;
-
+    private RSSDataBaseAdapter mRss;
     private PopupWindow mPopupWindow;
     private List<RssFeedModel> mFeedModelList;
     private String mFeedTitle;
@@ -72,31 +82,79 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        mEditText = (EditText) findViewById(R.id.rssFeedEditText);
-        mAddPreferency = (FloatingActionButton) findViewById(R.id.fab);
-        mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        mFeedTitleTextView = (TextView) findViewById(R.id.feedTitle);
-        mFeedDescriptionTextView = (TextView) findViewById(R.id.feedDescription);
-        mFeedLinkTextView = (TextView) findViewById(R.id.feedLink);
-        mContext = getApplicationContext();
-        mActivity = MainActivity.this;
+            mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+            mEditText = (EditText) findViewById(R.id.rssFeedEditText);
+            mAddPreferency = (FloatingActionButton) findViewById(R.id.fab);
+            mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+            mFeedTitleTextView = (TextView) findViewById(R.id.feedTitle);
+            mFeedDescriptionTextView = (TextView) findViewById(R.id.feedDescription);
+            mFeedLinkTextView = (TextView) findViewById(R.id.feedLink);
+            mContext = getApplicationContext();
+            mActivity = MainActivity.this;
+            mIntent = this.getIntent();
+            mRss = new RSSDataBaseAdapter(this);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        mAddPreferency.setOnClickListener(new View.OnClickListener() {
+            mAddPreferency.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setTitle("Add a new RSS feed");
-                alertDialog.setMessage("Enter the RSS link below");
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+            public void onClick(final View view) {
+                final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Insert Title and RSS link");
+                final TextInputEditText title = new TextInputEditText(MainActivity.this);
+                final TextInputEditText link = new TextInputEditText(MainActivity.this);
+                title.setInputType(InputType.TYPE_CLASS_TEXT);
+                link.setInputType(InputType.TYPE_CLASS_TEXT);
+                title.setHint("RSS Title");
+                link.setHint("RSS Link");
+                LinearLayout ll=new LinearLayout(MainActivity.this);
+                ll.setOrientation(LinearLayout.VERTICAL);
+                ll.setPadding(55, 0, 55, 0);
+                ll.addView(title);
+                ll.addView(link);
+                alertDialog.setView(ll);
+
+                alertDialog.setCancelable(false);
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Cancel",
+
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (title.getText().toString().equals("") || link.getText().toString().equals("")) {
+                                    Snackbar.make(view
+                                            , "Empty fields, please retry", Snackbar.LENGTH_LONG)
+                                            .setAction("CLOSE", new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+
+                                                }
+                                            })
+                                            .show();
+                                } else {
+
+                                    String id;
+                                    mRss = mRss.open();
+                                    mRss.insertEntry(link.getText().toString(), title.getText().toString(), Integer.valueOf(mIntent.getStringExtra("user_id")));
+                                    Snackbar.make(view
+                                            , "Feed " +  title.getText().toString() + " added successfully", Snackbar.LENGTH_LONG)
+                                            .setAction("CLOSE", new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+
+                                                }
+                                            })
+                                            .show();
+                                    mRss.close();
+                                    alertDialog.dismiss();
+                                }
                             }
                         });
                 alertDialog.show();
@@ -122,7 +180,30 @@ public class MainActivity extends AppCompatActivity {
                 new FetchFeedTask().execute((Void) null);
             }
         });
-        new FetchFeedTask().execute((Void) null);
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public void getUserLinks() {
+        List<String> links = mRss.getLinks(Integer.valueOf(mIntent.getStringExtra("user_id")));
+        Log.v("Logs", String.valueOf(links));
+        for (int i = 0; i < links.size(); i++) {
+            mLinks = links.get(i);
+            URL url = null;
+            try {
+                url = new URL(mLinks);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            InputStream inputStream = null;
+            try {
+                inputStream = url.openConnection().getInputStream();
+                mFeedModelList = this.parseFeed(inputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public List<RssFeedModel> parseFeed(InputStream inputStream) throws XmlPullParserException, IOException {
@@ -210,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
             mFeedTitleTextView.setText("Feed Title: " + mFeedTitle);
             mFeedDescriptionTextView.setText("Feed Description: " + mFeedDescription);
             mFeedLinkTextView.setText("Feed Link: " + mFeedLink);
-            urlLink = mEditText.getText().toString();
+            urlLink = mEditText.getText().toString() == "" ? mLinks : mEditText.getText().toString();
         }
 
         @Override
@@ -285,7 +366,15 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if (id == R.id.feeds) {
+            Intent intentSuccess = new Intent(MainActivity.this ,ListFeed.class);
+            intentSuccess.putExtra("links", String.valueOf(mRss.getLinks(Integer.valueOf(mIntent.getStringExtra("user_id")))));
+            startActivity(intentSuccess);
+        }
         if (id == R.id.action_settings) {
+            Intent intentSuccess = new Intent(MainActivity.this , SignInActivity.class);
+            startActivity(intentSuccess);
+            mRss.close();
             return true;
         }
 
@@ -298,18 +387,10 @@ public class MainActivity extends AppCompatActivity {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.feeds) {
+            Intent intentSuccess = new Intent(MainActivity.this ,ListFeed.class);
+            intentSuccess.putExtra("links", String.valueOf(mRss.getLinks(Integer.valueOf(mIntent.getStringExtra("user_id")))));
+            startActivity(intentSuccess);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

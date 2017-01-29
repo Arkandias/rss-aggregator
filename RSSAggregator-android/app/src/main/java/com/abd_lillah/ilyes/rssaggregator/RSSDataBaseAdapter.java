@@ -4,16 +4,21 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class RSSDataBaseAdapter
 {
-    static final String DATABASE_NAME = "login.db";
+    static final String DATABASE_NAME = "rss.db";
     static final int DATABASE_VERSION = 1;
     public static final int NAME_COLUMN = 1;
     // TODO: Create public field for each column in your table.
     // SQL Statement to create a new database.
-    static final String DATABASE_CREATE = "create table "+"LOGIN"+
-            "( " +"ID"+" integer primary key autoincrement,"+ "USERNAME  text,PASSWORD text); ";
+    static final String DATABASE_CREATE = "create table "+ "RSS"+
+            "( " +"ID"+" integer primary key autoincrement,"+ "LINK  text,TITLE text, USER_ID integer); ";
     // Variable to hold the database instance
     public  SQLiteDatabase db;
     // Context of the application using the database.
@@ -40,47 +45,76 @@ public class RSSDataBaseAdapter
         return db;
     }
 
-    public void insertEntry(String userName,String password)
+    public void insertEntry(String link,String title, int user_id)
     {
+        Log.v("Cred", link + " " + title);
         ContentValues newValues = new ContentValues();
         // Assign values for each row.
-        newValues.put("USERNAME", userName);
-        newValues.put("PASSWORD",password);
+        newValues.put("USER_ID", user_id);
+        newValues.put("LINK", link);
+        newValues.put("TITLE",title);
 
         // Insert the row into your table
-        db.insert("LOGIN", null, newValues);
+        db.insert("RSS", null, newValues);
         ///Toast.makeText(context, "Reminder Is Successfully Saved", Toast.LENGTH_LONG).show();
     }
-    public int deleteEntry(String UserName)
+    public int deleteEntry(String link)
     {
         //String id=String.valueOf(ID);
-        String where="USERNAME=?";
-        int numberOFEntriesDeleted= db.delete("LOGIN", where, new String[]{UserName}) ;
+        String where="LINK=?";
+        int numberOFEntriesDeleted= db.delete("RSS", where, new String[]{link}) ;
         // Toast.makeText(context, "Number fo Entry Deleted Successfully : "+numberOFEntriesDeleted, Toast.LENGTH_LONG).show();
         return numberOFEntriesDeleted;
     }
-    public String getSingleEntry(String userName)
+    public String getSingleEntry(String link)
     {
-        Cursor cursor=db.query("LOGIN", null, " USERNAME=?", new String[]{userName}, null, null, null);
+        Cursor cursor=db.query("RSS", null, " LINK=?", new String[]{link}, null, null, null);
         if(cursor.getCount()<1) // UserName Not Exist
         {
             cursor.close();
             return "NOT EXIST";
         }
         cursor.moveToFirst();
-        String password= cursor.getString(cursor.getColumnIndex("PASSWORD"));
+        String title= cursor.getString(cursor.getColumnIndex("TITLE"));
         cursor.close();
-        return password;
+        return title;
     }
-    public void  updateEntry(String userName,String password)
+
+    public List<String> getTitles(int userID) {
+        Cursor cursor = db.query("RSS", null, " userID=?", new String[]{String.valueOf(userID)}, null, null, null);
+
+        List<String> titles = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            titles.add(cursor.getString(cursor.getColumnIndex("TITLE")));
+            while (cursor.moveToNext()) {
+                titles.add(cursor.getString(cursor.getColumnIndex("TITLE")));
+            }
+        }
+        return titles;
+    }
+
+    public List<String> getLinks(int userID) {
+        Cursor cursor = db.rawQuery("select * from RSS where USER_ID=" + userID, null);
+
+        List<String> links = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            links.add(cursor.getString(cursor.getColumnIndex("LINK")));
+            while (cursor.moveToNext()) {
+                links.add(cursor.getString(cursor.getColumnIndex("LINK")));
+            }
+        }
+        return links;
+    }
+
+    public void  updateEntry(String link,String title)
     {
         // Define the updated row content.
         ContentValues updatedValues = new ContentValues();
         // Assign values for each row.
-        updatedValues.put("USERNAME", userName);
-        updatedValues.put("PASSWORD",password);
+        updatedValues.put("LINK", link);
+        updatedValues.put("TITLE",title);
 
-        String where="USERNAME = ?";
-        db.update("LOGIN",updatedValues, where, new String[]{userName});
+        String where="TITLE = ?";
+        db.update("LINK",updatedValues, where, new String[]{link});
     }
 }

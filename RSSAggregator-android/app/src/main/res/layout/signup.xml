@@ -8,42 +8,43 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login to RSS Feed Aggregator Mobile"
-        android:id="@+id/textView2"
-        android:layout_gravity="center_horizontal"
+        android:text="No account ?\nRegister to RSS Feed Aggregator Mobile"
+        android:id="@+id/textView3"
         android:textSize="30dp" />
 
     <EditText
-        android:id="@+id/editTextUserNameToLogin"
+        android:id="@+id/editTextUserName"
+        android:hint="User Name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="User Name"
-        android:ems="10"
-        android:paddingTop="130dp">
+        android:layout_marginTop="80dp">
+
         <requestFocus />
     </EditText>
 
     <EditText
-        android:id="@+id/editTextPasswordToLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:hint="Password" />
-
-    <Button
-        android:id="@+id/buttonSignIn"
+        android:id="@+id/editTextPassword"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Sign In"
-        android:layout_weight="0.03"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/editTextConfirmPassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Confirm Password"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/buttonCreateAccount"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Account"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="80dp"
+        android:layout_weight="0.04"
         android:background="#ff6800"
-        android:textColor="#ffffff"
-        android:layout_marginTop="80dp" />
+        android:textColor="#fff" />
 
-    <Button
-        android:id="@+id/buttonSignUP"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Sign Up" />
 </LinearLayout>
